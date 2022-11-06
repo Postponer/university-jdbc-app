@@ -1,4 +1,4 @@
-package ua.com.foxminded.springbootjdbcapi.task22;
+package ua.com.foxminded.springbootjdbcapi.task22.models;
 
 public class Student {
 

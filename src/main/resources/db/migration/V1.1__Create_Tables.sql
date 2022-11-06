@@ -21,3 +21,10 @@ CREATE TABLE IF NOT EXISTS students
     last_name character(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT students_pkey PRIMARY KEY (student_id)
 );
+
+CREATE TABLE students_courses
+( 
+	student_id integer REFERENCES students(student_id) ON DELETE CASCADE, 
+	course_id integer REFERENCES courses(course_id) ON DELETE CASCADE, 
+	PRIMARY KEY(student_id, course_id) 
+);
