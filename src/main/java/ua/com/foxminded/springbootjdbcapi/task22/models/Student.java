@@ -2,16 +2,30 @@ package ua.com.foxminded.springbootjdbcapi.task22.models;
 
 public class Student {
 
+	private int studentId;
 	private int groupId;
 	private String firstName;
 	private String lastName;
 
-	public Student(int groupId, String firstName, String lastName) {
+	public Student(int studentId, int groupId, String firstName, String lastName) {
 
+		this.studentId = studentId;
 		this.groupId = groupId;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		
+	}
+	
+	public int getStudentId() {
+		
+		return studentId;
+		
+	}
 
+	public void setStudentId(int studentId) {
+		
+		this.studentId = studentId;
+		
 	}
 
 	public int getGroupId() {
@@ -52,7 +66,8 @@ public class Student {
 
 	@Override
 	public String toString() {
-		return "Student [groupId=" + groupId + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+		return "Student [studentId=" + studentId + ", groupId=" + groupId + ", firstName=" + firstName + ", lastName="
+				+ lastName + "]";
 	}
 
 }

@@ -2,13 +2,27 @@ package ua.com.foxminded.springbootjdbcapi.task22.models;
 
 public class Course {
 
+	private int courseId;
 	private String courseName;
 	private String courseDescription;
 
-	public Course(String courseName, String courseDescription) {
+	public Course(int courseId, String courseName, String courseDescription) {
 
+		this.courseId = courseId;
 		this.courseName = courseName;
 		this.courseDescription = courseDescription;
+
+	}
+
+	public int getCourseId() {
+
+		return courseId;
+
+	}
+
+	public void setCourseId(int courseId) {
+
+		this.courseId = courseId;
 
 	}
 
@@ -38,7 +52,8 @@ public class Course {
 
 	@Override
 	public String toString() {
-		return "Course [courseName=" + courseName + ", courseDescription=" + courseDescription + "]";
+		return "Course [courseId=" + courseId + ", courseName=" + courseName + ", courseDescription="
+				+ courseDescription + "]";
 	}
 
 }

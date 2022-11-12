@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
@@ -15,11 +14,12 @@ import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.CourseRowMapper;
 public class JdbcCourseDao {
 
 	private final JdbcTemplate jdbcTemplate;
-	private final RowMapper<Course> courseRowMapper = new CourseRowMapper();
+	private final CourseRowMapper courseRowMapper;
 
-	public JdbcCourseDao(JdbcTemplate jdbcTemplate) {
+	public JdbcCourseDao(JdbcTemplate jdbcTemplate, CourseRowMapper courseRowMapper) {
 
 		this.jdbcTemplate = jdbcTemplate;
+		this.courseRowMapper = courseRowMapper;
 
 	}
 
@@ -27,7 +27,7 @@ public class JdbcCourseDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from courses where course_name = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from courses where course_name = ?",
 					courseRowMapper, courseName));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -42,7 +42,7 @@ public class JdbcCourseDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from courses where course_description = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from courses where course_description = ?",
 					courseRowMapper, courseDescription));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -57,7 +57,7 @@ public class JdbcCourseDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from courses where course_id = ?", courseRowMapper,
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from courses where course_id = ?", courseRowMapper,
 					courseId));
 
 		} catch (EmptyResultDataAccessException e) {

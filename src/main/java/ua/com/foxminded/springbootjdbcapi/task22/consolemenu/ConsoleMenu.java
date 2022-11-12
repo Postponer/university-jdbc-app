@@ -75,16 +75,7 @@ public class ConsoleMenu {
 	}
 
 	private void performAction(int choice) {
-
-		int studentId = 0;
-		int courseId = 0;
-		int groupId = 0;
-		String courseName;
-		int studentNumber = 0;
-		String firstName;
-		String lastName;
 		
-
 		switch (choice) {
 
 		case 0:
@@ -95,101 +86,32 @@ public class ConsoleMenu {
 
 		case 1:
 
-			try {
-
-				System.out.println("Please enter a number of students: ");
-				studentNumber = Integer.parseInt(scanner.nextLine());
-
-			} catch (NumberFormatException e) {
-
-				System.out.println("Invalid input. Please use numbers.");
-
-			}
-
-			System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
+			menuFindGroupsByStudentNumber();
 			break;
 
 		case 2:
 
-			System.out.println("Please enter name of the course: ");
-			courseName = scanner.nextLine();
-			System.out.println(studentDao.findStudentsByCourse(courseName));
+			menuFindStudentsByCourse();
 			break;
 
 		case 3:
 
-			try {
-
-				System.out.println("Please enter group_id: ");
-				groupId = Integer.parseInt(scanner.nextLine());
-
-			} catch (NumberFormatException e) {
-
-				System.out.println("Invalid input. Please use numbers.");
-
-			}
-
-			System.out.println("Please enter first name: ");
-		    firstName = scanner.nextLine();
-
-			System.out.println("Please enter last name: ");
-			lastName = scanner.nextLine();
-			
-			studentDao.save(new Student(groupId, firstName, lastName));
+			addNewStudent();
 			break;
 
 		case 4:
 
-			try {
-
-				System.out.println("Please enter student_id: ");
-				studentId = Integer.parseInt(scanner.nextLine());
-
-			} catch (NumberFormatException e) {
-
-				System.out.println("Invalid input. Please use numbers.");
-
-			}
-
-			studentDao.delete(studentId);
+			deleteStudent();
 			break;
 
 		case 5:
 
-			try {
-
-				System.out.println("Please enter student_id: ");
-				studentId = Integer.parseInt(scanner.nextLine());
-
-				System.out.println("Please enter course_id: ");
-				courseId = Integer.parseInt(scanner.nextLine());
-
-			} catch (NumberFormatException e) {
-
-				System.out.println("Invalid input. Please use numbers.");
-
-			}
-
-			studentDao.addStudentToCourse(studentId, courseId);
+			menuAddStudentToCourse();
 			break;
 
 		case 6:
 
-			try {
-
-				System.out.println("Please enter student_id: ");
-				studentId = Integer.parseInt(scanner.nextLine());
-
-				System.out.println("Please enter course_id: ");
-				courseId = Integer.parseInt(scanner.nextLine());
-
-			} catch (NumberFormatException e) {
-
-				System.out.println("Invalid input. Please use numbers.");
-
-			}
-
-			studentDao.removeStudentFromCourse(studentId, courseId);
+			menuRemoveStudentFromCourse();
 			break;
 
 		default:
@@ -198,6 +120,128 @@ public class ConsoleMenu {
 
 		}
 
+	}
+	
+	private void menuFindGroupsByStudentNumber() {
+		
+		int studentNumber = 0;
+
+		try {
+
+			System.out.println("Please enter a number of students: ");
+			studentNumber = Integer.parseInt(scanner.nextLine());
+
+		} catch (NumberFormatException e) {
+
+			System.out.println("Invalid input. Please use numbers.");
+
+		}
+
+		System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
+		
+	}
+	
+	private void menuFindStudentsByCourse() {
+		
+		String courseName;
+		
+		System.out.println("Please enter name of the course: ");
+		courseName = scanner.nextLine();
+		System.out.println(studentDao.findStudentsByCourse(courseName));
+		
+	}
+	
+	private void addNewStudent() {
+		
+		int studentId = 0;
+		int groupId = 0;
+		String firstName;
+		String lastName;
+		
+		try {
+
+			System.out.println("Please enter group_id: ");
+			groupId = Integer.parseInt(scanner.nextLine());
+
+		} catch (NumberFormatException e) {
+
+			System.out.println("Invalid input. Please use numbers.");
+
+		}
+
+		System.out.println("Please enter first name: ");
+	    firstName = scanner.nextLine();
+
+		System.out.println("Please enter last name: ");
+		lastName = scanner.nextLine();
+		
+		studentDao.save(new Student(studentId, groupId, firstName, lastName));
+		
+	}
+	
+	private void deleteStudent() {
+		
+		int studentId = 0;
+		
+		try {
+
+			System.out.println("Please enter student_id: ");
+			studentId = Integer.parseInt(scanner.nextLine());
+
+		} catch (NumberFormatException e) {
+
+			System.out.println("Invalid input. Please use numbers.");
+
+		}
+
+		studentDao.delete(studentId);
+		
+	}
+	
+	private void menuAddStudentToCourse() {
+		
+		int studentId = 0;
+		int courseId = 0;
+		
+		try {
+
+			System.out.println("Please enter student_id: ");
+			studentId = Integer.parseInt(scanner.nextLine());
+
+			System.out.println("Please enter course_id: ");
+			courseId = Integer.parseInt(scanner.nextLine());
+
+		} catch (NumberFormatException e) {
+
+			System.out.println("Invalid input. Please use numbers.");
+
+		}
+
+		studentDao.addStudentToCourse(studentId, courseId);
+		
+	}
+	
+	private void menuRemoveStudentFromCourse() {
+		
+		int studentId = 0;
+		int courseId = 0;
+		
+		try {
+
+			System.out.println("Please enter student_id: ");
+			studentId = Integer.parseInt(scanner.nextLine());
+
+			System.out.println("Please enter course_id: ");
+			courseId = Integer.parseInt(scanner.nextLine());
+
+		} catch (NumberFormatException e) {
+
+			System.out.println("Invalid input. Please use numbers.");
+
+		}
+
+		studentDao.removeStudentFromCourse(studentId, courseId);
+		
 	}
 
 }

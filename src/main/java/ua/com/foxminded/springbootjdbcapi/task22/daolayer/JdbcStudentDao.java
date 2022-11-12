@@ -1,11 +1,12 @@
 package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
@@ -15,19 +16,20 @@ import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentRowMapper;
 public class JdbcStudentDao {
 
 	private final JdbcTemplate jdbcTemplate;
-	private final RowMapper<Student> studentRowMapper = new StudentRowMapper();
+	private final StudentRowMapper studentRowMapper;
 
-	public JdbcStudentDao(JdbcTemplate jdbcTemplate) {
+	public JdbcStudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper studentRowMapper) {
 
 		this.jdbcTemplate = jdbcTemplate;
+		this.studentRowMapper = studentRowMapper;
 
 	}
 
-	public Optional<Student> getByGroupId(String groupId) {
+	public Optional<Student> getByGroupId(int groupId) {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from students where group_id = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where group_id = ?",
 					studentRowMapper, groupId));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -42,7 +44,7 @@ public class JdbcStudentDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from students where first_name = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where first_name = ?",
 					studentRowMapper, firstName));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -57,7 +59,7 @@ public class JdbcStudentDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from students where last_name = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where last_name = ?",
 					studentRowMapper, lastName));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -72,7 +74,7 @@ public class JdbcStudentDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from students where student_id = ?",
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where student_id = ?",
 					studentRowMapper, studentId));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -99,7 +101,7 @@ public class JdbcStudentDao {
 	public void update(int studentId, String[] params) {
 
 		jdbcTemplate.update("update students set group_id = ?, first_name = ?, last_name = ? where student_id = ?",
-				params[0], params[1], params[2], studentId);
+				Integer.parseInt(params[0]), params[1], params[2], studentId);
 
 	}
 
@@ -111,10 +113,17 @@ public class JdbcStudentDao {
 
 	public List<Student> findStudentsByCourse(String courseName) {
 
-		return jdbcTemplate.query(
-				"SELECT * FROM courses JOIN students_courses ON courses.course_id = students_courses.course_id JOIN students ON students_courses.student_id = students.student_id WHERE course_name = '"
-						+ courseName + "'",
-				studentRowMapper);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(
+				"SELECT * FROM courses JOIN students_courses ON courses.course_id = students_courses.course_id JOIN students ON students_courses.student_id = students.student_id WHERE course_name = ?",
+				courseName);
+		List<Student> studentList = new ArrayList<>();
+		list.forEach(m -> {
+			Student student = new Student((Integer) m.get("student_id"), (Integer) m.get("group_id"),
+					(String) m.get("first_name"), (String) m.get("last_name"));
+			studentList.add(student);
+		});
+
+		return studentList;
 
 	}
 

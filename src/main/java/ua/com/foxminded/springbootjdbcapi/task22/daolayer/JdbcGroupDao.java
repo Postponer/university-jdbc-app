@@ -1,11 +1,12 @@
 package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
@@ -15,11 +16,12 @@ import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.GroupRowMapper;
 public class JdbcGroupDao {
 
 	private final JdbcTemplate jdbcTemplate;
-	private final RowMapper<Group> groupRowMapper = new GroupRowMapper();
+	private final GroupRowMapper groupRowMapper;
 
-	public JdbcGroupDao(JdbcTemplate jdbcTemplate) {
+	public JdbcGroupDao(JdbcTemplate jdbcTemplate, GroupRowMapper groupRowMapper) {
 
 		this.jdbcTemplate = jdbcTemplate;
+		this.groupRowMapper = groupRowMapper;
 
 	}
 
@@ -27,8 +29,8 @@ public class JdbcGroupDao {
 
 		try {
 
-			return Optional.of(jdbcTemplate.queryForObject("select * from groups where group_name = ?", groupRowMapper,
-					groupName));
+			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from groups where group_name = ?",
+					groupRowMapper, groupName));
 
 		} catch (EmptyResultDataAccessException e) {
 
@@ -42,7 +44,7 @@ public class JdbcGroupDao {
 
 		try {
 
-			return Optional.of(
+			return Optional.ofNullable(
 					jdbcTemplate.queryForObject("select * from groups where group_id = ?", groupRowMapper, groupId));
 
 		} catch (EmptyResultDataAccessException e) {
@@ -79,10 +81,16 @@ public class JdbcGroupDao {
 
 	public List<Group> findGroupsByStudentNumber(int studentNumber) {
 
-		return jdbcTemplate.query(
-				"SELECT groups.*, COUNT(students.group_id) FROM groups LEFT JOIN students ON groups.group_id = students.group_id GROUP BY groups.group_id HAVING COUNT(students.group_id) <= "
-						+ studentNumber,
-				groupRowMapper);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(
+				"SELECT groups.*, COUNT(students.group_id) FROM groups LEFT JOIN students ON groups.group_id = students.group_id GROUP BY groups.group_id HAVING COUNT(students.group_id) <= ?",
+				studentNumber);
+		List<Group> groupList = new ArrayList<>();
+		list.forEach(m -> {
+			Group group = new Group((Integer) m.get("group_id"), (String) m.get("group_name"));
+			groupList.add(group);
+		});
+
+		return groupList;
 
 	}
 

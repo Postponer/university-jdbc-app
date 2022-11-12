@@ -1,3 +1,0 @@
-INSERT INTO students (group_id, first_name, last_name) VALUES (1, 'Alex', 'Miller'), (1, 'John', 'Doe'), (1, 'Jane', 'Doe');
-INSERT INTO courses (course_name, course_description) VALUES ('Math', 'Math course'), ('Biology', 'Biology course'), ('Physics', 'Physics course'), ('English', 'English course'), ('Music', 'Music course'), ('Art', 'Art course'), ('Geography', 'Geography course'), ('Sports', 'Sports course'), ('Literature', 'Literature course'), ('History', 'History course');
-INSERT INTO groups (group_name) VALUES ('AA-01'), ('AA-02'), ('AA-03'), ('AA-04'), ('AA-05'), ('AA-06'), ('AA-07'), ('AA-08'), ('AA-09'), ('AA-10');

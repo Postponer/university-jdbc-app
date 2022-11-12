@@ -1,29 +1,34 @@
 package ua.com.foxminded.springbootjdbcapi.task22.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.springbootjdbcapi.task22.consolemenu.ConsoleMenu;
+import ua.com.foxminded.springbootjdbcapi.task22.databasefacade.DatabaseFacade;
+import ua.com.foxminded.springbootjdbcapi.task22.generator.Generator;
 
-@Component
-public class Controller implements CommandLineRunner {
+@Service
+public class Controller {
 
-	private static Logger logger = LoggerFactory.getLogger(Controller.class);
 	private ConsoleMenu consoleMenu;
-	
-	public Controller(ConsoleMenu consoleMenu) {
+	private DatabaseFacade databaseFacade;
+
+	public Controller(ConsoleMenu consoleMenu, DatabaseFacade databaseFacade) {
 		
 		this.consoleMenu = consoleMenu;
+		this.databaseFacade = databaseFacade;
 		
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
+	@PostConstruct
+	public void start() {
 
-		logger.info("EXECUTING : command line runner");
-
+		databaseFacade.createNCourses(10);
+		databaseFacade.createNGroups(10);
+		databaseFacade.createNStudents(200);
+		databaseFacade.removeExcessiveStudentsFromGroups();
+		databaseFacade.assignCoursesRandomlyToStudents(Generator.getRandomStudentCoursesMap(200));
 		consoleMenu.runMenu();
 
 	}
