@@ -24,6 +24,7 @@ public class Controller {
 	@PostConstruct
 	public void start() {
 
+		databaseFacade.clearDatabaseFacade();
 		databaseFacade.createNCourses(10);
 		databaseFacade.createNGroups(10);
 		databaseFacade.createNStudents(200);

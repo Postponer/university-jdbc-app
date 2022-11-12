@@ -128,5 +128,14 @@ public class DatabaseFacade {
 		}
 
 	}
+	
+	public void clearDatabaseFacade() {
+		
+		jdbcTemplate.update("truncate table students_courses, students, groups, courses");
+		jdbcTemplate.update("ALTER SEQUENCE students_student_id_seq RESTART WITH 1");
+		jdbcTemplate.update("ALTER SEQUENCE groups_group_id_seq RESTART WITH 1");
+		jdbcTemplate.update("ALTER SEQUENCE courses_course_id_seq RESTART WITH 1");
+		
+	}
 
 }
