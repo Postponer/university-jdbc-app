@@ -2,6 +2,9 @@ package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,15 +36,9 @@ class JdbcCourseDaoTest {
 	}
 
 	@BeforeEach
-	void emptyTables() {
+	void reset() {
 
 		jdbcTemplate.update("truncate table students_courses, courses");
-
-	}
-
-	@BeforeEach
-	void resetCoursesSerial() {
-
 		jdbcTemplate.update("ALTER SEQUENCE courses_course_id_seq RESTART WITH 1");
 
 	}
@@ -74,9 +71,11 @@ class JdbcCourseDaoTest {
 	void testGetByIdForCourses_shouldCheckIfCourseHasBeenFoundById_whenMethodIsExecuted() {
 
 		courseDao.save(new Course(1, "Math", "Math Course"));
-		assertEquals(
-				"Optional[Course [courseId=1, courseName=Math                                                                                                                                                                                                                                                           , courseDescription=Math Course                                                                                                                                                                                                                                                    ]]",
-				courseDao.getById(1).toString());
+		Optional<Course> result = courseDao.getById(1);
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getCourseId());
+		assertEquals("Math", result.get().getCourseName());
+		assertEquals("Math Course", result.get().getCourseDescription());
 
 	}
 
@@ -84,9 +83,11 @@ class JdbcCourseDaoTest {
 	void testGetByNameForCourses_shouldCheckIfCourseHasBeenFoundByName_whenMethodIsExecuted() {
 
 		courseDao.save(new Course(1, "Math", "Math Course"));
-		assertEquals(
-				"Optional[Course [courseId=1, courseName=Math                                                                                                                                                                                                                                                           , courseDescription=Math Course                                                                                                                                                                                                                                                    ]]",
-				courseDao.getByName("Math").toString());
+		Optional<Course> result = courseDao.getByName("Math");
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getCourseId());
+		assertEquals("Math", result.get().getCourseName());
+		assertEquals("Math Course", result.get().getCourseDescription());
 
 	}
 
@@ -94,9 +95,11 @@ class JdbcCourseDaoTest {
 	void testGetByDescriptionForCourses_shouldCheckIfCourseHasBeenFoundByDescription_whenMethodIsExecuted() {
 
 		courseDao.save(new Course(1, "Math", "Math Course"));
-		assertEquals(
-				"Optional[Course [courseId=1, courseName=Math                                                                                                                                                                                                                                                           , courseDescription=Math Course                                                                                                                                                                                                                                                    ]]",
-				courseDao.getByDescription("Math Course").toString());
+		Optional<Course> result = courseDao.getByDescription("Math Course");
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getCourseId());
+		assertEquals("Math", result.get().getCourseName());
+		assertEquals("Math Course", result.get().getCourseDescription());
 
 	}
 
@@ -106,9 +109,11 @@ class JdbcCourseDaoTest {
 		courseDao.save(new Course(1, "Math", "Math Course"));
 		String[] params = { "UPDATED", "UPDATED" };
 		courseDao.update(1, params);
-		assertEquals(
-				"Optional[Course [courseId=1, courseName=UPDATED                                                                                                                                                                                                                                                        , courseDescription=UPDATED                                                                                                                                                                                                                                                        ]]",
-				courseDao.getById(1).toString());
+		Optional<Course> result = courseDao.getById(1);
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getCourseId());
+		assertEquals("UPDATED", result.get().getCourseName());
+		assertEquals("UPDATED", result.get().getCourseDescription());
 
 	}
 

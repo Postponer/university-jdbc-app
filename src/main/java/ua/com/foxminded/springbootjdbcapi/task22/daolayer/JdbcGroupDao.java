@@ -1,8 +1,6 @@
 package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -81,16 +79,9 @@ public class JdbcGroupDao {
 
 	public List<Group> findGroupsByStudentNumber(int studentNumber) {
 
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(
-				"SELECT groups.*, COUNT(students.group_id) FROM groups LEFT JOIN students ON groups.group_id = students.group_id GROUP BY groups.group_id HAVING COUNT(students.group_id) <= ?",
-				studentNumber);
-		List<Group> groupList = new ArrayList<>();
-		list.forEach(m -> {
-			Group group = new Group((Integer) m.get("group_id"), (String) m.get("group_name"));
-			groupList.add(group);
-		});
-
-		return groupList;
+		return jdbcTemplate.query(
+				"SELECT groups.* FROM groups LEFT JOIN students ON groups.group_id = students.group_id GROUP BY groups.group_id HAVING COUNT(students.group_id) <= ?",
+				groupRowMapper, studentNumber);
 
 	}
 

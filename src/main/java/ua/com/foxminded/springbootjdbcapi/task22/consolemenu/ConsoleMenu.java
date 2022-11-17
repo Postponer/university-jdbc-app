@@ -10,7 +10,7 @@ import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 
 @Component
 public class ConsoleMenu {
-	
+
 	private volatile boolean exit = false;
 	private static final int NUMBER_OF_CHOICES = 6;
 	private Scanner scanner = new Scanner(System.in);
@@ -18,10 +18,10 @@ public class ConsoleMenu {
 	private JdbcStudentDao studentDao;
 
 	public ConsoleMenu(JdbcGroupDao groupDao, JdbcStudentDao studentDao) {
-		
+
 		this.groupDao = groupDao;
 		this.studentDao = studentDao;
-		
+
 	}
 
 	public void runMenu() {
@@ -75,7 +75,7 @@ public class ConsoleMenu {
 	}
 
 	private void performAction(int choice) {
-		
+
 		switch (choice) {
 
 		case 0:
@@ -86,12 +86,12 @@ public class ConsoleMenu {
 
 		case 1:
 
-			menuFindGroupsByStudentNumber();
+			findGroupsByStudentNumber();
 			break;
 
 		case 2:
 
-			menuFindStudentsByCourse();
+			findStudentsByCourse();
 			break;
 
 		case 3:
@@ -106,12 +106,12 @@ public class ConsoleMenu {
 
 		case 5:
 
-			menuAddStudentToCourse();
+			addStudentToCourse();
 			break;
 
 		case 6:
 
-			menuRemoveStudentFromCourse();
+			removeStudentFromCourse();
 			break;
 
 		default:
@@ -121,15 +121,14 @@ public class ConsoleMenu {
 		}
 
 	}
-	
-	private void menuFindGroupsByStudentNumber() {
-		
-		int studentNumber = 0;
+
+	private void findGroupsByStudentNumber() {
 
 		try {
 
 			System.out.println("Please enter a number of students: ");
-			studentNumber = Integer.parseInt(scanner.nextLine());
+			int studentNumber = Integer.parseInt(scanner.nextLine());
+			System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
 
 		} catch (NumberFormatException e) {
 
@@ -137,31 +136,32 @@ public class ConsoleMenu {
 
 		}
 
-		System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
-		
 	}
-	
-	private void menuFindStudentsByCourse() {
-		
+
+	private void findStudentsByCourse() {
+
 		String courseName;
-		
+
 		System.out.println("Please enter name of the course: ");
 		courseName = scanner.nextLine();
 		System.out.println(studentDao.findStudentsByCourse(courseName));
-		
+
 	}
-	
+
 	private void addNewStudent() {
-		
-		int studentId = 0;
-		int groupId = 0;
-		String firstName;
-		String lastName;
-		
+
 		try {
 
 			System.out.println("Please enter group_id: ");
-			groupId = Integer.parseInt(scanner.nextLine());
+			int groupId = Integer.parseInt(scanner.nextLine());
+
+			System.out.println("Please enter first name: ");
+			String firstName = scanner.nextLine();
+
+			System.out.println("Please enter last name: ");
+			String lastName = scanner.nextLine();
+
+			studentDao.save(new Student(0, groupId, firstName, lastName));
 
 		} catch (NumberFormatException e) {
 
@@ -169,24 +169,16 @@ public class ConsoleMenu {
 
 		}
 
-		System.out.println("Please enter first name: ");
-	    firstName = scanner.nextLine();
-
-		System.out.println("Please enter last name: ");
-		lastName = scanner.nextLine();
-		
-		studentDao.save(new Student(studentId, groupId, firstName, lastName));
-		
 	}
-	
+
 	private void deleteStudent() {
-		
-		int studentId = 0;
-		
+
 		try {
 
 			System.out.println("Please enter student_id: ");
-			studentId = Integer.parseInt(scanner.nextLine());
+			int studentId = Integer.parseInt(scanner.nextLine());
+
+			studentDao.delete(studentId);
 
 		} catch (NumberFormatException e) {
 
@@ -194,22 +186,19 @@ public class ConsoleMenu {
 
 		}
 
-		studentDao.delete(studentId);
-		
 	}
-	
-	private void menuAddStudentToCourse() {
-		
-		int studentId = 0;
-		int courseId = 0;
-		
+
+	private void addStudentToCourse() {
+
 		try {
 
 			System.out.println("Please enter student_id: ");
-			studentId = Integer.parseInt(scanner.nextLine());
+			int studentId = Integer.parseInt(scanner.nextLine());
 
 			System.out.println("Please enter course_id: ");
-			courseId = Integer.parseInt(scanner.nextLine());
+			int courseId = Integer.parseInt(scanner.nextLine());
+
+			studentDao.addStudentToCourse(studentId, courseId);
 
 		} catch (NumberFormatException e) {
 
@@ -217,22 +206,19 @@ public class ConsoleMenu {
 
 		}
 
-		studentDao.addStudentToCourse(studentId, courseId);
-		
 	}
-	
-	private void menuRemoveStudentFromCourse() {
-		
-		int studentId = 0;
-		int courseId = 0;
-		
+
+	private void removeStudentFromCourse() {
+
 		try {
 
 			System.out.println("Please enter student_id: ");
-			studentId = Integer.parseInt(scanner.nextLine());
+			int studentId = Integer.parseInt(scanner.nextLine());
 
 			System.out.println("Please enter course_id: ");
-			courseId = Integer.parseInt(scanner.nextLine());
+			int courseId = Integer.parseInt(scanner.nextLine());
+
+			studentDao.removeStudentFromCourse(studentId, courseId);
 
 		} catch (NumberFormatException e) {
 
@@ -240,8 +226,6 @@ public class ConsoleMenu {
 
 		}
 
-		studentDao.removeStudentFromCourse(studentId, courseId);
-		
 	}
 
 }

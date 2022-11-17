@@ -1,8 +1,6 @@
 package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -113,17 +111,9 @@ public class JdbcStudentDao {
 
 	public List<Student> findStudentsByCourse(String courseName) {
 
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(
-				"SELECT * FROM courses JOIN students_courses ON courses.course_id = students_courses.course_id JOIN students ON students_courses.student_id = students.student_id WHERE course_name = ?",
-				courseName);
-		List<Student> studentList = new ArrayList<>();
-		list.forEach(m -> {
-			Student student = new Student((Integer) m.get("student_id"), (Integer) m.get("group_id"),
-					(String) m.get("first_name"), (String) m.get("last_name"));
-			studentList.add(student);
-		});
-
-		return studentList;
+		return jdbcTemplate.query(
+				"SELECT students.* FROM courses JOIN students_courses ON courses.course_id = students_courses.course_id JOIN students ON students_courses.student_id = students.student_id WHERE course_name = ?",
+				studentRowMapper, courseName);
 
 	}
 

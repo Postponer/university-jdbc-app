@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
@@ -22,7 +24,7 @@ public class Generator {
 			"Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez",
 			"Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Lee"));
 	private static final Map<String, String> COURSE_NAMES_AND_DESCRIPTIONS = new HashMap<>();
-	
+
 	static {
 
 		COURSE_NAMES_AND_DESCRIPTIONS.put("Math", "Math course");
@@ -37,7 +39,7 @@ public class Generator {
 		COURSE_NAMES_AND_DESCRIPTIONS.put("Sports", "Sports course");
 
 	}
-	
+
 	private static final List<Course> COURSES = COURSE_NAMES_AND_DESCRIPTIONS.entrySet().stream()
 			.map(entry -> new Course(0, entry.getKey(), entry.getValue())).collect(Collectors.toList());
 
@@ -45,15 +47,15 @@ public class Generator {
 
 		Map<Integer, ArrayList<Integer>> studentsAndCourses = new LinkedHashMap<>();
 
-		for (int i = 0; i < studentQuantity; i++) {
+		for (int studentId = 0; studentId < studentQuantity; studentId++) {
 
-			List<Integer> studentCourses = getRandomCoursesForStudent();
+			Set<Integer> studentCourses = getRandomCoursesForStudent();
 
-			studentsAndCourses.put((i + 1), new ArrayList<>());
+			studentsAndCourses.put((studentId + 1), new ArrayList<>());
 
 			for (int j = 0; j < studentCourses.size(); j++) {
 
-				studentsAndCourses.get(i + 1).add(studentCourses.get(j));
+				studentsAndCourses.get(studentId + 1).add((int) studentCourses.toArray()[j]);
 
 			}
 
@@ -63,49 +65,21 @@ public class Generator {
 
 	}
 
-	private static List<Integer> getRandomCoursesForStudent() {
+	private static Set<Integer> getRandomCoursesForStudent() {
 
-		List<Integer> studentCourses = new ArrayList<>();
+		Set<Integer> studentCourses = new LinkedHashSet<>();
 
 		int randomRepeats = randomInRange(1, MAX_NUMBER_OF_REPEATS);
 
-		for (int i = 0; i < randomRepeats; i++) {
+		while (studentCourses.size() < randomRepeats) {
 
-			studentCourses.add(getRandomCourse(studentCourses));
+			int randomCourse = randomInRange(1, NUMBER_OF_COURSES);
+
+			studentCourses.add(randomCourse);
 
 		}
 
 		return studentCourses;
-
-	}
-
-	private static int getRandomCourse(List<Integer> studentCourses) {
-
-		int randomCourse = randomInRange(1, NUMBER_OF_COURSES);
-
-		for (int j = 0; j < studentCourses.size(); j++) {
-
-			if (j == 1) {
-
-				while (studentCourses.get(j) == randomCourse || studentCourses.get(j - 1) == randomCourse) {
-
-					randomCourse = randomInRange(1, NUMBER_OF_COURSES);
-
-				}
-
-			} else {
-
-				while (studentCourses.get(j) == randomCourse) {
-
-					randomCourse = randomInRange(1, NUMBER_OF_COURSES);
-
-				}
-
-			}
-
-		}
-
-		return randomCourse;
 
 	}
 

@@ -2,6 +2,10 @@ package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,22 +40,10 @@ class JdbcGroupDaoTest {
 	}
 
 	@BeforeEach
-	void emptyTables() {
+	void reset() {
 
 		jdbcTemplate.update("truncate table students_courses, students, groups");
-
-	}
-
-	@BeforeEach
-	void resetGroupsSerial() {
-
 		jdbcTemplate.update("ALTER SEQUENCE groups_group_id_seq RESTART WITH 1");
-
-	}
-
-	@BeforeEach
-	void resetStudentsSerial() {
-
 		jdbcTemplate.update("ALTER SEQUENCE students_student_id_seq RESTART WITH 1");
 
 	}
@@ -84,9 +76,10 @@ class JdbcGroupDaoTest {
 	void testGetByIdForGroups_shouldCheckIfGroupHasBeenFoundById_whenMethodIsExecuted() {
 
 		groupDao.save(new Group(1, "AA-03"));
-		assertEquals(
-				"Optional[Group [groupId=1, groupName=AA-03                                                                                                                                                                                                                                                          ]]",
-				groupDao.getById(1).toString());
+		Optional<Group> result = groupDao.getById(1);
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getGroupId());
+		assertEquals("AA-03", result.get().getGroupName());
 
 	}
 
@@ -96,9 +89,10 @@ class JdbcGroupDaoTest {
 		groupDao.save(new Group(1, "AA-04"));
 		String[] params = { "UPDATED" };
 		groupDao.update(1, params);
-		assertEquals(
-				"Optional[Group [groupId=1, groupName=UPDATED                                                                                                                                                                                                                                                        ]]",
-				groupDao.getById(1).toString());
+		Optional<Group> result = groupDao.getById(1);
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getGroupId());
+		assertEquals("UPDATED", result.get().getGroupName());
 
 	}
 
@@ -106,9 +100,10 @@ class JdbcGroupDaoTest {
 	void testGetByNameForGroups_shouldCheckIfGroupHasBeenFoundByName_whenMethodIsExecuted() {
 
 		groupDao.save(new Group(1, "AA-05"));
-		assertEquals(
-				"Optional[Group [groupId=1, groupName=AA-05                                                                                                                                                                                                                                                          ]]",
-				groupDao.getByName("AA-05").toString());
+		Optional<Group> result = groupDao.getByName("AA-05");
+		assertTrue(result.isPresent());
+		assertEquals(1, result.get().getGroupId());
+		assertEquals("AA-05", result.get().getGroupName());
 
 	}
 
@@ -120,9 +115,9 @@ class JdbcGroupDaoTest {
 		studentDao.save(new Student(1, 1, "John", "Doe"));
 		studentDao.save(new Student(2, 1, "Jane", "Doe"));
 		studentDao.save(new Student(3, 2, "Alex", "Miller"));
-		assertEquals(
-				"[Group [groupId=2, groupName=AA-07                                                                                                                                                                                                                                                          ]]",
-				groupDao.findGroupsByStudentNumber(1).toString());
+		Group result = groupDao.findGroupsByStudentNumber(1).get(0);
+		assertEquals(2, result.getGroupId());
+		assertEquals("AA-07", result.getGroupName());
 
 	}
 
@@ -134,9 +129,14 @@ class JdbcGroupDaoTest {
 		studentDao.save(new Student(1, 1, "John", "Doe"));
 		studentDao.save(new Student(2, 1, "Jane", "Doe"));
 		studentDao.save(new Student(3, 2, "Alex", "Miller"));
-		assertEquals(
-				"[Group [groupId=2, groupName=AA-09                                                                                                                                                                                                                                                          ], Group [groupId=1, groupName=AA-08                                                                                                                                                                                                                                                          ]]",
-				groupDao.findGroupsByStudentNumber(4).toString());
+		List<Group> results = groupDao.findGroupsByStudentNumber(4);
+		assertThat(results).hasSize(2);
+		Group firstResult = results.get(0);
+		assertEquals(2, firstResult.getGroupId());
+		assertEquals("AA-09", firstResult.getGroupName());
+		Group secondResult = results.get(1);
+		assertEquals(1, secondResult.getGroupId());
+		assertEquals("AA-08", secondResult.getGroupName());
 
 	}
 

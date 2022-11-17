@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS courses
 (
     course_id SERIAL,
-    course_name character(255) COLLATE pg_catalog."default" NOT NULL,
-    course_description character(255) COLLATE pg_catalog."default" NOT NULL,
+    course_name varchar(255) COLLATE pg_catalog."default" NOT NULL,
+    course_description varchar(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT courses_pkey PRIMARY KEY (course_id)
 );
     
 CREATE TABLE IF NOT EXISTS groups
 (
     group_id SERIAL,
-    group_name character(255) COLLATE pg_catalog."default" NOT NULL,
+    group_name varchar(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT groups_pkey PRIMARY KEY (group_id)
 );
 
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS students
 (
     student_id SERIAL,
     group_id integer,
-    first_name character(255) COLLATE pg_catalog."default" NOT NULL,
-    last_name character(255) COLLATE pg_catalog."default" NOT NULL,
+    first_name varchar(255) COLLATE pg_catalog."default" NOT NULL,
+    last_name varchar(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT students_pkey PRIMARY KEY (student_id)
 );
 
