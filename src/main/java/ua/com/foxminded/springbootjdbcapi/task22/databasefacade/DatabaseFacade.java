@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
@@ -16,7 +16,7 @@ import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 
-@Repository
+@Service
 public class DatabaseFacade {
 
 	private static final int NUMBER_OF_GROUPS = 10;

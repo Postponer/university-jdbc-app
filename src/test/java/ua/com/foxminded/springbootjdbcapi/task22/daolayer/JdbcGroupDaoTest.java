@@ -16,9 +16,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
-import ua.com.foxminded.springbootjdbcapi.task22.controller.Controller;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.ConsoleMenuService;
 
 @SpringBootTest(classes = { Config.class, Application.class })
 class JdbcGroupDaoTest {
@@ -28,7 +28,7 @@ class JdbcGroupDaoTest {
 	private JdbcTemplate jdbcTemplate;
 
 	@MockBean
-	private Controller controller;
+	private ConsoleMenuService consoleMenuService;
 
 	@Autowired
 	public JdbcGroupDaoTest(JdbcGroupDao groupDao, JdbcStudentDao studentDao, JdbcTemplate jdbcTemplate) {

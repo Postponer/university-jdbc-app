@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import ua.com.foxminded.springbootjdbcapi.task22.controller.Controller;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.ConsoleMenuService;
 
 @SpringBootTest
 class ApplicationTests {
 
 	@MockBean
-	private Controller controller;
+	private ConsoleMenuService consoleMenuService;
 
 	@Test
 	void contextLoads() {
