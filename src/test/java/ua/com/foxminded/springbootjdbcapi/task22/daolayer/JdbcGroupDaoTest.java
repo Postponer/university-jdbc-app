@@ -11,24 +11,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
-import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.ConsoleMenuService;
 
+@ActiveProfiles("test")
 @SpringBootTest(classes = { Config.class, Application.class })
 class JdbcGroupDaoTest {
 
 	private JdbcGroupDao groupDao;
 	private JdbcStudentDao studentDao;
 	private JdbcTemplate jdbcTemplate;
-
-	@MockBean
-	private ConsoleMenuService consoleMenuService;
 
 	@Autowired
 	public JdbcGroupDaoTest(JdbcGroupDao groupDao, JdbcStudentDao studentDao, JdbcTemplate jdbcTemplate) {

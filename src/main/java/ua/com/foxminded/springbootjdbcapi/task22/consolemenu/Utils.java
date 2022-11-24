@@ -4,21 +4,21 @@ import java.util.Scanner;
 
 import org.springframework.stereotype.Component;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.GroupService;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.StudentService;
 
 @Component
 public class Utils {
 
 	private Scanner scanner = new Scanner(System.in);
-	private JdbcGroupDao groupDao;
-	private JdbcStudentDao studentDao;
+	private GroupService groupService;
+	private StudentService studentService;
 
-	public Utils(JdbcGroupDao groupDao, JdbcStudentDao studentDao) {
+	public Utils(GroupService groupDao, StudentService studentDao) {
 
-		this.groupDao = groupDao;
-		this.studentDao = studentDao;
+		this.groupService = groupDao;
+		this.studentService = studentDao;
 
 	}
 
@@ -28,7 +28,7 @@ public class Utils {
 
 			System.out.println("Please enter a number of students: ");
 			int studentNumber = Integer.parseInt(scanner.nextLine());
-			System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
+			System.out.println(groupService.findGroupsByStudentNumber(studentNumber));
 
 		} catch (NumberFormatException e) {
 
@@ -44,7 +44,7 @@ public class Utils {
 
 		System.out.println("Please enter name of the course: ");
 		courseName = scanner.nextLine();
-		System.out.println(studentDao.findStudentsByCourse(courseName));
+		System.out.println(studentService.findStudentsByCourse(courseName));
 
 	}
 
@@ -61,7 +61,7 @@ public class Utils {
 			System.out.println("Please enter last name: ");
 			String lastName = scanner.nextLine();
 
-			studentDao.save(new Student(0, groupId, firstName, lastName));
+			studentService.save(new Student(0, groupId, firstName, lastName));
 
 		} catch (NumberFormatException e) {
 
@@ -78,7 +78,7 @@ public class Utils {
 			System.out.println("Please enter student_id: ");
 			int studentId = Integer.parseInt(scanner.nextLine());
 
-			studentDao.delete(studentId);
+			studentService.delete(studentId);
 
 		} catch (NumberFormatException e) {
 
@@ -98,7 +98,7 @@ public class Utils {
 			System.out.println("Please enter course_id: ");
 			int courseId = Integer.parseInt(scanner.nextLine());
 
-			studentDao.addStudentToCourse(studentId, courseId);
+			studentService.addStudentToCourse(studentId, courseId);
 
 		} catch (NumberFormatException e) {
 
@@ -118,7 +118,7 @@ public class Utils {
 			System.out.println("Please enter course_id: ");
 			int courseId = Integer.parseInt(scanner.nextLine());
 
-			studentDao.removeStudentFromCourse(studentId, courseId);
+			studentService.removeStudentFromCourse(studentId, courseId);
 
 		} catch (NumberFormatException e) {
 

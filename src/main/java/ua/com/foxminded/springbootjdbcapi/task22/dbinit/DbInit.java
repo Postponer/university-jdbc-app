@@ -1,4 +1,4 @@
-package ua.com.foxminded.springbootjdbcapi.task22.databasefacade;
+package ua.com.foxminded.springbootjdbcapi.task22.dbinit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
@@ -16,8 +16,8 @@ import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 
-@Service
-public class DatabaseFacade {
+@Component
+public class DbInit {
 
 	private static final int NUMBER_OF_GROUPS = 10;
 	private static final int MAX_NUMBER_OF_STUDENTS_IN_GROUP = 30;
@@ -27,7 +27,7 @@ public class DatabaseFacade {
 	private JdbcGroupDao groupDao;
 	private JdbcStudentDao studentDao;
 
-	public DatabaseFacade(JdbcTemplate jdbcTemplate, JdbcCourseDao courseDao, JdbcGroupDao groupDao,
+	public DbInit(JdbcTemplate jdbcTemplate, JdbcCourseDao courseDao, JdbcGroupDao groupDao,
 			JdbcStudentDao studentDao) {
 
 		this.jdbcTemplate = jdbcTemplate;

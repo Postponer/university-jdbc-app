@@ -74,17 +74,21 @@ public class JdbcCourseDao {
 
 	}
 
-	public void save(Course course) {
+	public Course save(Course course) {
 
 		jdbcTemplate.update("insert into courses (course_name, course_description) values (?, ?)",
 				course.getCourseName(), course.getCourseDescription());
+		return jdbcTemplate.queryForObject("select * from courses where course_id = ?", courseRowMapper,
+				course.getCourseId());
 
 	}
 
-	public void update(int courseId, String[] params) {
+	public Course update(int courseId, String[] params) {
 
 		jdbcTemplate.update("update courses set course_name = ?, course_description = ? where course_id = ?", params[0],
 				params[1], courseId);
+		return jdbcTemplate.queryForObject("select * from courses where course_id = ?", courseRowMapper,
+				courseId);
 
 	}
 
