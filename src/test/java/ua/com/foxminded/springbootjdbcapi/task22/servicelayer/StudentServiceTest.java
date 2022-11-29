@@ -9,30 +9,30 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.consolemenu.ConsoleMenu;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
 
-@SpringBootTest(classes = { Application.class })
+@ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private StudentService studentService;
 
-	@MockBean
+	@Mock
 	private ConsoleMenu consoleMenu;
 
-	@MockBean
+	@Mock
 	private JdbcStudentDao studentDao;
 
-	@MockBean
+	@Mock
 	private DbInitService dbInitService;
 
 	@Test

@@ -14,7 +14,6 @@ import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
 
-
 @SpringBootTest(classes = { Config.class, Application.class })
 class DbInitServiceTest {
 

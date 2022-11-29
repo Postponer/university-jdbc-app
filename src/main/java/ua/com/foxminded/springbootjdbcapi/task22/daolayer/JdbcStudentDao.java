@@ -98,8 +98,7 @@ public class JdbcStudentDao {
 
 		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
 				student.getGroupId(), student.getFirstName(), student.getLastName());
-		return jdbcTemplate.queryForObject("select * from students where student_id = ?", studentRowMapper,
-				student.getStudentId());
+		return jdbcTemplate.queryForObject("select * from students order by student_id desc limit 1", studentRowMapper);
 
 	}
 
@@ -136,10 +135,11 @@ public class JdbcStudentDao {
 	public boolean removeStudentFromCourse(int studentId, int courseId) {
 
 		jdbcTemplate.update("DELETE FROM students_courses WHERE student_id = ? AND course_id = ?", studentId, courseId);
-		
-		StudentCourse studentCourse = jdbcTemplate.queryForObject("select * from students_courses where student_id = ? and course_id = ?",
-				studentCourseRowMapper, studentId, courseId);
-		
+
+		StudentCourse studentCourse = jdbcTemplate.queryForObject(
+				"select * from students_courses where student_id = ? and course_id = ?", studentCourseRowMapper,
+				studentId, courseId);
+
 		if (studentCourse == null) {
 
 			return false;

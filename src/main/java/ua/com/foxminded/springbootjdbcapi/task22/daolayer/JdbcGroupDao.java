@@ -62,8 +62,7 @@ public class JdbcGroupDao {
 	public Group save(Group group) {
 
 		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
-		return jdbcTemplate.queryForObject("select * from groups where group_id = ?", groupRowMapper,
-				group.getGroupId());
+		return jdbcTemplate.queryForObject("select * from groups order by group_id desc limit 1", groupRowMapper);
 
 	}
 
