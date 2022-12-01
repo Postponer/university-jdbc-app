@@ -2,7 +2,6 @@ package ua.com.foxminded.springbootjdbcapi.task22.servicelayer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.springbootjdbcapi.task22.consolemenu.ConsoleMenu;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 
@@ -26,26 +24,20 @@ class CourseServiceTest {
 	private CourseService courseService;
 
 	@Mock
-	private ConsoleMenu consoleMenu;
-
-	@Mock
 	private JdbcCourseDao courseDao;
-
-	@Mock
-	private DbInitService dbInitService;
 
 	@Test
 	void testGetByName() {
 
 		Course course = new Course(1, "Math", "Math course");
 		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getByName("Math")).thenReturn(optionalCourse);
-		Optional<Course> result = courseService.getByName("Math");
-		assertTrue(result.isPresent());
-		assertEquals(1, result.get().getCourseId());
-		assertEquals("Math", result.get().getCourseName());
-		assertEquals("Math course", result.get().getCourseDescription());
-		assertThat(courseService.getByName("Math")).isEqualTo(optionalCourse);
+		Mockito.when(courseDao.getByName(Mockito.any(String.class))).thenReturn(optionalCourse);
+		Course result = courseService.getByName("Math");
+		Mockito.verify(courseDao).getByName(Mockito.any(String.class));
+		assertEquals(1, result.getCourseId());
+		assertEquals("Math", result.getCourseName());
+		assertEquals("Math course", result.getCourseDescription());
+		assertEquals(course, result);
 
 	}
 
@@ -54,13 +46,13 @@ class CourseServiceTest {
 
 		Course course = new Course(1, "Math", "Math course");
 		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getByDescription("Math course")).thenReturn(optionalCourse);
-		Optional<Course> result = courseService.getByDescription("Math course");
-		assertTrue(result.isPresent());
-		assertEquals(1, result.get().getCourseId());
-		assertEquals("Math", result.get().getCourseName());
-		assertEquals("Math course", result.get().getCourseDescription());
-		assertThat(courseService.getByDescription("Math course")).isEqualTo(optionalCourse);
+		Mockito.when(courseDao.getByDescription(Mockito.any(String.class))).thenReturn(optionalCourse);
+		Course result = courseService.getByDescription("Math course");
+		Mockito.verify(courseDao).getByDescription(Mockito.any(String.class));
+		assertEquals(1, result.getCourseId());
+		assertEquals("Math", result.getCourseName());
+		assertEquals("Math course", result.getCourseDescription());
+		assertEquals(course, result);
 
 	}
 
@@ -69,36 +61,31 @@ class CourseServiceTest {
 
 		Course course = new Course(1, "Math", "Math course");
 		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getById(1)).thenReturn(optionalCourse);
-		Optional<Course> result = courseService.getById(1);
-		assertTrue(result.isPresent());
-		assertEquals(1, result.get().getCourseId());
-		assertEquals("Math", result.get().getCourseName());
-		assertEquals("Math course", result.get().getCourseDescription());
-		assertThat(courseService.getById(1)).isEqualTo(optionalCourse);
+		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(optionalCourse);
+		Course result = courseService.getById(1);
+		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
+		assertEquals(1, result.getCourseId());
+		assertEquals("Math", result.getCourseName());
+		assertEquals("Math course", result.getCourseDescription());
+		assertEquals(course, result);
 
 	}
 
 	@Test
 	void testGetAll() {
 
-		Course course1 = new Course(1, "Math", "Math course");
-		Course course2 = new Course(1, "Biology", "Biology course");
+		Course course = new Course(1, "Math", "Math course");
 		List<Course> courseList = new ArrayList<>();
-		courseList.add(course1);
-		courseList.add(course2);
+		courseList.add(course);
 		Mockito.when(courseDao.getAll()).thenReturn(courseList);
 		List<Course> results = courseService.getAll();
-		assertThat(results).hasSize(2);
-		Course result1 = results.get(0);
-		assertEquals(1, result1.getCourseId());
-		assertEquals("Math", result1.getCourseName());
-		assertEquals("Math course", result1.getCourseDescription());
-		Course result2 = results.get(1);
-		assertEquals(1, result2.getCourseId());
-		assertEquals("Biology", result2.getCourseName());
-		assertEquals("Biology course", result2.getCourseDescription());
-		assertThat(courseService.getAll()).isEqualTo(courseList);
+		Mockito.verify(courseDao).getAll();
+		assertThat(results).hasSize(1);
+		Course result = results.get(0);
+		assertEquals(1, result.getCourseId());
+		assertEquals("Math", result.getCourseName());
+		assertEquals("Math course", result.getCourseDescription());
+		assertEquals(courseList, results);
 
 	}
 
@@ -106,12 +93,13 @@ class CourseServiceTest {
 	void testSave() {
 
 		Course course = new Course(1, "Math", "Math course");
-		Mockito.when(courseDao.save(course)).thenReturn(course);
+		Mockito.when(courseDao.save(Mockito.any(Course.class))).thenReturn(course);
 		Course result = courseService.save(course);
+		Mockito.verify(courseDao).save(Mockito.any(Course.class));
 		assertEquals(1, result.getCourseId());
 		assertEquals("Math", result.getCourseName());
 		assertEquals("Math course", result.getCourseDescription());
-		assertThat(courseService.save(course)).isEqualTo(course);
+		assertEquals(course, result);
 
 	}
 
@@ -120,16 +108,19 @@ class CourseServiceTest {
 
 		String[] params = { "UPDATED", "UPDATED" };
 		Course updatedCourse = new Course(1, "UPDATED", "UPDATED");
-		Mockito.when(courseDao.update(1, params)).thenReturn(updatedCourse);
+		Mockito.when(courseDao.update(Mockito.any(Integer.class), Mockito.any(String[].class)))
+				.thenReturn(updatedCourse);
 		assertThat(courseService.update(1, params)).isEqualTo(updatedCourse);
+		Mockito.verify(courseDao).update(Mockito.any(Integer.class), Mockito.any(String[].class));
 
 	}
 
 	@Test
 	void testDeleteWhenOptionalIsEmpty() {
 
-		Mockito.when(courseDao.getById(1)).thenReturn(Optional.empty());
+		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(Optional.empty());
 		assertEquals(true, courseService.delete(1));
+		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
 
 	}
 
@@ -138,8 +129,9 @@ class CourseServiceTest {
 
 		Course course = new Course(1, "Math", "Math course");
 		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getById(1)).thenReturn(optionalCourse);
+		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(optionalCourse);
 		assertEquals(false, courseService.delete(1));
+		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
 
 	}
 

@@ -2,7 +2,6 @@ package ua.com.foxminded.springbootjdbcapi.task22.servicelayer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.springbootjdbcapi.task22.consolemenu.ConsoleMenu;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 
@@ -26,25 +24,19 @@ class GroupServiceTest {
 	private GroupService groupService;
 
 	@Mock
-	private ConsoleMenu consoleMenu;
-
-	@Mock
 	private JdbcGroupDao groupDao;
-
-	@Mock
-	private DbInitService dbInitService;
 
 	@Test
 	void testGetByName() {
 
 		Group group = new Group(1, "AA-01");
 		Optional<Group> optionalGroup = Optional.of(group);
-		Mockito.when(groupDao.getByName("AA-01")).thenReturn(optionalGroup);
-		Optional<Group> result = groupService.getByName("AA-01");
-		assertTrue(result.isPresent());
-		assertEquals(1, result.get().getGroupId());
-		assertEquals("AA-01", result.get().getGroupName());
-		assertThat(groupService.getByName("AA-01")).isEqualTo(optionalGroup);
+		Mockito.when(groupDao.getByName(Mockito.any(String.class))).thenReturn(optionalGroup);
+		Group result = groupService.getByName("AA-01");
+		Mockito.verify(groupDao).getByName(Mockito.any(String.class));
+		assertEquals(1, result.getGroupId());
+		assertEquals("AA-01", result.getGroupName());
+		assertEquals(group, result);
 
 	}
 
@@ -53,33 +45,29 @@ class GroupServiceTest {
 
 		Group group = new Group(1, "AA-02");
 		Optional<Group> optionalGroup = Optional.of(group);
-		Mockito.when(groupDao.getById(1)).thenReturn(optionalGroup);
-		Optional<Group> result = groupService.getById(1);
-		assertTrue(result.isPresent());
-		assertEquals(1, result.get().getGroupId());
-		assertEquals("AA-02", result.get().getGroupName());
-		assertThat(groupService.getById(1)).isEqualTo(optionalGroup);
+		Mockito.when(groupDao.getById(Mockito.any(Integer.class))).thenReturn(optionalGroup);
+		Group result = groupService.getById(1);
+		Mockito.verify(groupDao).getById(Mockito.any(Integer.class));
+		assertEquals(1, result.getGroupId());
+		assertEquals("AA-02", result.getGroupName());
+		assertEquals(group, result);
 
 	}
 
 	@Test
 	void testGetAll() {
 
-		Group group1 = new Group(1, "AA-03");
-		Group group2 = new Group(2, "AA-04");
+		Group group = new Group(1, "AA-03");
 		List<Group> groupList = new ArrayList<>();
-		groupList.add(group1);
-		groupList.add(group2);
+		groupList.add(group);
 		Mockito.when(groupDao.getAll()).thenReturn(groupList);
 		List<Group> results = groupService.getAll();
-		assertThat(results).hasSize(2);
-		Group result1 = results.get(0);
-		assertEquals(1, result1.getGroupId());
-		assertEquals("AA-03", result1.getGroupName());
-		Group result2 = results.get(1);
-		assertEquals(2, result2.getGroupId());
-		assertEquals("AA-04", result2.getGroupName());
-		assertThat(groupService.getAll()).isEqualTo(groupList);
+		Mockito.verify(groupDao).getAll();
+		assertThat(results).hasSize(1);
+		Group result = results.get(0);
+		assertEquals(1, result.getGroupId());
+		assertEquals("AA-03", result.getGroupName());
+		assertEquals(groupList, results);
 
 	}
 
@@ -87,11 +75,12 @@ class GroupServiceTest {
 	void testSave() {
 
 		Group group = new Group(1, "AA-05");
-		Mockito.when(groupDao.save(group)).thenReturn(group);
+		Mockito.when(groupDao.save(Mockito.any(Group.class))).thenReturn(group);
 		Group result = groupService.save(group);
+		Mockito.verify(groupDao).save(Mockito.any(Group.class));
 		assertEquals(1, result.getGroupId());
 		assertEquals("AA-05", result.getGroupName());
-		assertThat(groupService.save(group)).isEqualTo(group);
+		assertEquals(group, result);
 
 	}
 
@@ -100,16 +89,18 @@ class GroupServiceTest {
 
 		String[] params = { "UPDATED" };
 		Group updatedGroup = new Group(1, "UPDATED");
-		Mockito.when(groupDao.update(1, params)).thenReturn(updatedGroup);
+		Mockito.when(groupDao.update(Mockito.any(Integer.class), Mockito.any(String[].class))).thenReturn(updatedGroup);
 		assertThat(groupService.update(1, params)).isEqualTo(updatedGroup);
+		Mockito.verify(groupDao).update(Mockito.any(Integer.class), Mockito.any(String[].class));
 
 	}
 
 	@Test
 	void testDeleteWhenOptionalIsEmpty() {
 
-		Mockito.when(groupDao.getById(1)).thenReturn(Optional.empty());
+		Mockito.when(groupDao.getById(Mockito.any(Integer.class))).thenReturn(Optional.empty());
 		assertEquals(true, groupService.delete(1));
+		Mockito.verify(groupDao).getById(Mockito.any(Integer.class));
 
 	}
 
@@ -118,8 +109,9 @@ class GroupServiceTest {
 
 		Group group = new Group(1, "AA-06");
 		Optional<Group> optionalGroup = Optional.of(group);
-		Mockito.when(groupDao.getById(1)).thenReturn(optionalGroup);
+		Mockito.when(groupDao.getById(Mockito.any(Integer.class))).thenReturn(optionalGroup);
 		assertEquals(false, groupService.delete(1));
+		Mockito.verify(groupDao).getById(Mockito.any(Integer.class));
 
 	}
 
@@ -131,8 +123,9 @@ class GroupServiceTest {
 		List<Group> groupList = new ArrayList<>();
 		groupList.add(group1);
 		groupList.add(group2);
-		Mockito.when(groupDao.findGroupsByStudentNumber(1)).thenReturn(groupList);
+		Mockito.when(groupDao.findGroupsByStudentNumber(Mockito.any(Integer.class))).thenReturn(groupList);
 		assertThat(groupService.findGroupsByStudentNumber(1)).isEqualTo(groupList);
+		Mockito.verify(groupDao).findGroupsByStudentNumber(Mockito.any(Integer.class));
 
 	}
 

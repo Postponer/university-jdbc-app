@@ -1,8 +1,9 @@
 package ua.com.foxminded.springbootjdbcapi.task22.servicelayer;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
@@ -12,6 +13,7 @@ import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 public class CourseService {
 
 	private JdbcCourseDao courseDao;
+	Logger logger = LoggerFactory.getLogger(CourseService.class);
 
 	public CourseService(JdbcCourseDao courseDao) {
 
@@ -19,55 +21,84 @@ public class CourseService {
 
 	}
 
-	public Optional<Course> getByName(String courseName) {
+	public Course getByName(String courseName) {
 
-		return courseDao.getByName(courseName);
+		logger.debug("Entering get course by name endpoint");
+		Course course = courseDao.getByName(courseName).get();
+		logger.info(course.toString() + " has been gotten by name: " + courseName);
 
-	}
-
-	public Optional<Course> getByDescription(String courseDescription) {
-
-		return courseDao.getByDescription(courseDescription);
+		return course;
 
 	}
 
-	public Optional<Course> getById(int courseId) {
+	public Course getByDescription(String courseDescription) {
 
-		return courseDao.getById(courseId);
+		logger.debug("Entering get course by description endpoint");
+		Course course = courseDao.getByDescription(courseDescription).get();
+		logger.info(course.toString() + " has been gotten by description: " + courseDescription);
+
+		return course;
+
+	}
+
+	public Course getById(int courseId) {
+
+		logger.debug("Entering get course by id endpoint");
+		Course course = courseDao.getById(courseId).get();
+		logger.info(course.toString() + " has been gotten by id: " + courseId);
+
+		return course;
 
 	}
 
 	public List<Course> getAll() {
 
-		return courseDao.getAll();
+		logger.debug("Entering get all courses endpoint");
+		List<Course> courseList = courseDao.getAll();
+		logger.info("All courses have been gotten");
+
+		return courseList;
 
 	}
 
 	public Course save(Course course) {
 
-		return courseDao.save(course);
+		logger.debug("Entering save course endpoint");
+		Course savedCourse = courseDao.save(course);
+		logger.info(course.toString() + " has been saved");
+
+		return savedCourse;
 
 	}
 
 	public Course update(int courseId, String[] params) {
 
-		return courseDao.update(courseId, params);
+		logger.debug("Entering update course endpoint");
+		Course course = courseDao.update(courseId, params);
+		logger.info("Course with id: " + courseId + " has been updated with this parameters: " + params);
+
+		return course;
 
 	}
 
 	public boolean delete(int courseId) {
 
+		logger.debug("Entering delete course endpoint");
 		courseDao.delete(courseId);
-		
-		Optional<Course> course = getById(courseId);
 
-		if (course.isPresent()) {
+		try {
 
-			return false;
+			getById(courseId);
+			logger.info("Course with id: " + courseId + " has been deleted");
+
+		} catch (Exception e) {
+
+			return true;
 
 		}
 
-		return true;
+		logger.error("Unable to delete course with id: " + courseId);
+		return false;
 
 	}
 

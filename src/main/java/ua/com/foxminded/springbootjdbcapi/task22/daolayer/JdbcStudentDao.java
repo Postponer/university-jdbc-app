@@ -132,21 +132,9 @@ public class JdbcStudentDao {
 
 	}
 
-	public boolean removeStudentFromCourse(int studentId, int courseId) {
+	public void removeStudentFromCourse(int studentId, int courseId) {
 
 		jdbcTemplate.update("DELETE FROM students_courses WHERE student_id = ? AND course_id = ?", studentId, courseId);
-
-		StudentCourse studentCourse = jdbcTemplate.queryForObject(
-				"select * from students_courses where student_id = ? and course_id = ?", studentCourseRowMapper,
-				studentId, courseId);
-
-		if (studentCourse == null) {
-
-			return false;
-
-		}
-
-		return true;
 
 	}
 
