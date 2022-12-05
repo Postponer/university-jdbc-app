@@ -10,22 +10,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
-import ua.com.foxminded.springbootjdbcapi.task22.controller.Controller;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 
+@ActiveProfiles("test")
 @SpringBootTest(classes = { Config.class, Application.class })
 class JdbcCourseDaoTest {
 
 	private JdbcCourseDao courseDao;
 	private JdbcTemplate jdbcTemplate;
-
-	@MockBean
-	private Controller controller;
 
 	@Autowired
 	public JdbcCourseDaoTest(JdbcCourseDao courseDao, JdbcTemplate jdbcTemplate) {

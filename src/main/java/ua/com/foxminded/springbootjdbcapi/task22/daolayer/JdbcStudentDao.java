@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
+import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentCourseRowMapper;
 import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentRowMapper;
 
 @Repository
@@ -15,11 +17,14 @@ public class JdbcStudentDao {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final StudentRowMapper studentRowMapper;
+	private final StudentCourseRowMapper studentCourseRowMapper;
 
-	public JdbcStudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper studentRowMapper) {
+	public JdbcStudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper studentRowMapper,
+			StudentCourseRowMapper studentCourseRowMapper) {
 
 		this.jdbcTemplate = jdbcTemplate;
 		this.studentRowMapper = studentRowMapper;
+		this.studentCourseRowMapper = studentCourseRowMapper;
 
 	}
 
@@ -89,17 +94,19 @@ public class JdbcStudentDao {
 
 	}
 
-	public void save(Student student) {
+	public Student save(Student student) {
 
 		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
 				student.getGroupId(), student.getFirstName(), student.getLastName());
+		return jdbcTemplate.queryForObject("select * from students order by student_id desc limit 1", studentRowMapper);
 
 	}
 
-	public void update(int studentId, String[] params) {
+	public Student update(int studentId, String[] params) {
 
 		jdbcTemplate.update("update students set group_id = ?, first_name = ?, last_name = ? where student_id = ?",
 				Integer.parseInt(params[0]), params[1], params[2], studentId);
+		return jdbcTemplate.queryForObject("select * from students where student_id = ?", studentRowMapper, studentId);
 
 	}
 
@@ -117,9 +124,11 @@ public class JdbcStudentDao {
 
 	}
 
-	public void addStudentToCourse(int studentId, int courseId) {
+	public StudentCourse addStudentToCourse(int studentId, int courseId) {
 
 		jdbcTemplate.update("INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)", studentId, courseId);
+		return jdbcTemplate.queryForObject("select * from students_courses where student_id = ? and course_id = ?",
+				studentCourseRowMapper, studentId, courseId);
 
 	}
 

@@ -2,15 +2,11 @@ package ua.com.foxminded.springbootjdbcapi.task22;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 
-import ua.com.foxminded.springbootjdbcapi.task22.controller.Controller;
-
+@ActiveProfiles("test")
 @SpringBootTest
 class ApplicationTests {
-
-	@MockBean
-	private Controller controller;
 
 	@Test
 	void contextLoads() {

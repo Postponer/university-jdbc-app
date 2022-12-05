@@ -2,11 +2,12 @@ package ua.com.foxminded.springbootjdbcapi.task22.consolemenu;
 
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
-import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.GroupService;
+import ua.com.foxminded.springbootjdbcapi.task22.servicelayer.StudentService;
 
 @Component
 public class ConsoleMenu {
@@ -14,17 +15,20 @@ public class ConsoleMenu {
 	private volatile boolean exit = false;
 	private static final int NUMBER_OF_CHOICES = 6;
 	private Scanner scanner = new Scanner(System.in);
-	private JdbcGroupDao groupDao;
-	private JdbcStudentDao studentDao;
+	private GroupService groupService;
+	private StudentService studentService;
+	Logger logger = LoggerFactory.getLogger(ConsoleMenu.class);
 
-	public ConsoleMenu(JdbcGroupDao groupDao, JdbcStudentDao studentDao) {
+	public ConsoleMenu(GroupService groupService, StudentService studentService) {
 
-		this.groupDao = groupDao;
-		this.studentDao = studentDao;
+		this.groupService = groupService;
+		this.studentService = studentService;
 
 	}
 
 	public void runMenu() {
+		
+		logger.debug("Entering console menu run endpoint");
 
 		while (!exit) {
 
@@ -35,10 +39,14 @@ public class ConsoleMenu {
 		}
 
 		scanner.close();
+		
+		logger.info("Console menu has run");
 
 	}
 
 	private void printMenu() {
+		
+		logger.debug("Entering print menu endpoint");
 
 		System.out.println("\nWhat do you whant to do?");
 		System.out.println("1) Find all groups with less or equal students’ number;");
@@ -48,11 +56,15 @@ public class ConsoleMenu {
 		System.out.println("5) Add a student to the course (from a list);");
 		System.out.println("6) Remove the student from one of their courses;");
 		System.out.println("0) Exit.");
+		
+		logger.info("Menu has been printed");
 
 	}
 
 	private int getInput() {
 
+		logger.debug("Entering get input endpoint");
+		
 		int choice = -1;
 
 		while (choice < 0 || choice > NUMBER_OF_CHOICES) {
@@ -64,17 +76,21 @@ public class ConsoleMenu {
 
 			} catch (NumberFormatException e) {
 
+				logger.error("Unable to get input, message: " + e.getMessage(), e);
 				System.out.println("Invalid choice. Please try again.");
 
 			}
 
 		}
 
+		logger.info("Input has been gotten");
 		return choice;
 
 	}
 
 	private void performAction(int choice) {
+		
+		logger.debug("Entering action perfomance endpoint");
 
 		switch (choice) {
 
@@ -86,32 +102,32 @@ public class ConsoleMenu {
 
 		case 1:
 
-			findGroupsByStudentNumber();
+			groupService.findGroupsByStudentNumber();
 			break;
 
 		case 2:
 
-			findStudentsByCourse();
+			studentService.findStudentsByCourse();
 			break;
 
 		case 3:
 
-			addNewStudent();
+			studentService.addNewStudent();
 			break;
 
 		case 4:
 
-			deleteStudent();
+			studentService.deleteStudent();
 			break;
 
 		case 5:
 
-			addStudentToCourse();
+			studentService.addStudentToCourse();
 			break;
 
 		case 6:
 
-			removeStudentFromCourse();
+			studentService.removeStudentFromCourse();
 			break;
 
 		default:
@@ -119,112 +135,8 @@ public class ConsoleMenu {
 			System.out.println("An unknown error has occurred.");
 
 		}
-
-	}
-
-	private void findGroupsByStudentNumber() {
-
-		try {
-
-			System.out.println("Please enter a number of students: ");
-			int studentNumber = Integer.parseInt(scanner.nextLine());
-			System.out.println(groupDao.findGroupsByStudentNumber(studentNumber));
-
-		} catch (NumberFormatException e) {
-
-			System.out.println("Invalid input. Please use numbers.");
-
-		}
-
-	}
-
-	private void findStudentsByCourse() {
-
-		String courseName;
-
-		System.out.println("Please enter name of the course: ");
-		courseName = scanner.nextLine();
-		System.out.println(studentDao.findStudentsByCourse(courseName));
-
-	}
-
-	private void addNewStudent() {
-
-		try {
-
-			System.out.println("Please enter group_id: ");
-			int groupId = Integer.parseInt(scanner.nextLine());
-
-			System.out.println("Please enter first name: ");
-			String firstName = scanner.nextLine();
-
-			System.out.println("Please enter last name: ");
-			String lastName = scanner.nextLine();
-
-			studentDao.save(new Student(0, groupId, firstName, lastName));
-
-		} catch (NumberFormatException e) {
-
-			System.out.println("Invalid input. Please use numbers.");
-
-		}
-
-	}
-
-	private void deleteStudent() {
-
-		try {
-
-			System.out.println("Please enter student_id: ");
-			int studentId = Integer.parseInt(scanner.nextLine());
-
-			studentDao.delete(studentId);
-
-		} catch (NumberFormatException e) {
-
-			System.out.println("Invalid input. Please use numbers.");
-
-		}
-
-	}
-
-	private void addStudentToCourse() {
-
-		try {
-
-			System.out.println("Please enter student_id: ");
-			int studentId = Integer.parseInt(scanner.nextLine());
-
-			System.out.println("Please enter course_id: ");
-			int courseId = Integer.parseInt(scanner.nextLine());
-
-			studentDao.addStudentToCourse(studentId, courseId);
-
-		} catch (NumberFormatException e) {
-
-			System.out.println("Invalid input. Please use numbers.");
-
-		}
-
-	}
-
-	private void removeStudentFromCourse() {
-
-		try {
-
-			System.out.println("Please enter student_id: ");
-			int studentId = Integer.parseInt(scanner.nextLine());
-
-			System.out.println("Please enter course_id: ");
-			int courseId = Integer.parseInt(scanner.nextLine());
-
-			studentDao.removeStudentFromCourse(studentId, courseId);
-
-		} catch (NumberFormatException e) {
-
-			System.out.println("Invalid input. Please use numbers.");
-
-		}
+		
+		logger.info("Action has been performed");
 
 	}
 
