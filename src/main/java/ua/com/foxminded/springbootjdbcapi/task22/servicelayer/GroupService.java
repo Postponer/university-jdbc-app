@@ -25,9 +25,9 @@ public class GroupService {
 
 	public Group getByName(String groupName) {
 
-		logger.debug("Entering get group by name endpoint");
-		Group group = groupDao.getByName(groupName).get();
-		logger.info(group.toString() + " has been gotten by name: " + groupName);
+		logger.info("Getting group by name: {}", groupName);
+		Group group = groupDao.getByName(groupName).orElse(null);
+		logger.info("{} has been gotten by name: {}", group, groupName);
 
 		return group;
 
@@ -35,9 +35,9 @@ public class GroupService {
 
 	public Group getById(int groupId) {
 
-		logger.debug("Entering get group by id endpoint");
-		Group group = groupDao.getById(groupId).get();
-		logger.info(group.toString() + " has been gotten by id: " + groupId);
+		logger.info("Getting group by id: {}", groupId);
+		Group group = groupDao.getById(groupId).orElse(null);
+		logger.info("{} has been gotten by id: {}", group, groupId);
 
 		return group;
 
@@ -45,7 +45,7 @@ public class GroupService {
 
 	public List<Group> getAll() {
 
-		logger.debug("Entering get all groups endpoint");
+		logger.info("Getting all groups");
 		List<Group> groupList = groupDao.getAll();
 		logger.info("All groups have been gotten");
 
@@ -55,9 +55,9 @@ public class GroupService {
 
 	public Group save(Group group) {
 
-		logger.debug("Entering save group endpoint");
+		logger.info("Saving {}", group);
 		Group savedGroup = groupDao.save(group);
-		logger.info(group.toString() + " has been saved");
+		logger.info("{} has been saved", group);
 
 		return savedGroup;
 
@@ -65,9 +65,9 @@ public class GroupService {
 
 	public Group update(int groupId, String[] params) {
 
-		logger.debug("Entering update group endpoint");
+		logger.info("Updating group with id: {} with this parameters: {}", groupId, params);
 		Group group = groupDao.update(groupId, params);
-		logger.info("Group with id: " + groupId + " has been updated with this parameters: " + params);
+		logger.info("Group with id: {} has been updated with this parameters: {}", groupId, params);
 
 		return group;
 
@@ -75,30 +75,28 @@ public class GroupService {
 
 	public boolean delete(int groupId) {
 
-		logger.debug("Entering delete group endpoint");
-		groupDao.delete(groupId);
+		logger.info("Deleting group with id: {}", groupId);
 
 		try {
 
-			getById(groupId);
-			logger.info("Group with id: " + groupId + " has been deleted");
+			groupDao.delete(groupId);
+			logger.info("Group with id: {} has been deleted", groupId);
+			return true;
 
 		} catch (Exception e) {
 
-			return true;
+			logger.error("Exception occurred during group deletion by id: {}, message. Exception: ", groupId, e);
+			return false;
 
 		}
-
-		logger.error("Unable to delete group with id: " + groupId);
-		return false;
 
 	}
 
 	public List<Group> findGroupsByStudentNumber(int studentNumber) {
 
-		logger.debug("Entering find groups by student number endpoint");
+		logger.info("Finding groups by student number: {}", studentNumber);
 		List<Group> groupList = groupDao.findGroupsByStudentNumber(studentNumber);
-		logger.info("Groups with student number: " + studentNumber + "has been found");
+		logger.info("Groups with student number: {} has been found", studentNumber);
 
 		return groupList;
 
@@ -106,7 +104,7 @@ public class GroupService {
 
 	public void findGroupsByStudentNumber() {
 
-		logger.debug("Entering find groups by student number endpoint in console menu");
+		logger.info("Finding groups by student number in console menu");
 
 		try {
 
@@ -117,7 +115,9 @@ public class GroupService {
 
 		} catch (NumberFormatException e) {
 
-			logger.error("Unable to find groups by student number in console menu, message: " + e.getMessage(), e);
+			logger.error(
+					"Exception occurred during finding groups by student number in console menu, message. Exception: ",
+					e);
 			System.out.println("Invalid input. Please use numbers.");
 
 		}

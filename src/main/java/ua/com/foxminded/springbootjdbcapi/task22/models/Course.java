@@ -1,10 +1,34 @@
 package ua.com.foxminded.springbootjdbcapi.task22.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "courses")
 public class Course {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int courseId;
+
+	@Column(name = "COURSE_NAME")
 	private String courseName;
+
+	@Column(name = "COURSE_DESCRIPTION")
 	private String courseDescription;
+
+	@ManyToMany(mappedBy = "courses")
+	private List<Student> students = new ArrayList<>();
+
+	public Course() {}
 
 	public Course(int courseId, String courseName, String courseDescription) {
 

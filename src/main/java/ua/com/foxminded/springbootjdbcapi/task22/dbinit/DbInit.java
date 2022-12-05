@@ -42,7 +42,7 @@ public class DbInit {
 
 	public void createNCourses(int numberToGenerate) {
 		
-		logger.debug("Entering courses creation endpoint");
+		logger.info("Generating {} courses", numberToGenerate);
 
 		List<Course> courses = Generator.getCourses();
 
@@ -67,13 +67,13 @@ public class DbInit {
 
 		}
 		
-		logger.info(numberToGenerate + " courses have been created");
+		logger.info("{} courses have been created", numberToGenerate);
 
 	}
 
 	public void createNGroups(int numberToGenerate) {
 		
-		logger.debug("Entering groups creation endpoint");
+		logger.info("Generating {} groups", numberToGenerate);
 
 		for (int i = 0; i < numberToGenerate; i++) {
 
@@ -84,13 +84,13 @@ public class DbInit {
 
 		}
 		
-		logger.info(numberToGenerate + " groups have been created");
+		logger.info("{} groups have been created", numberToGenerate);
 
 	}
 
 	public void createNStudents(int numberToGenerate) {
 		
-		logger.debug("Entering students creation endpoint");
+		logger.info("Generating {} students", numberToGenerate);
 
 		for (int i = 0; i < numberToGenerate; i++) {
 
@@ -102,13 +102,13 @@ public class DbInit {
 
 		}
 		
-		logger.info(numberToGenerate + " students have been created");
+		logger.info("{} students have been created", numberToGenerate);
 
 	}
 
 	public void removeExcessiveStudentsFromGroups() {
 		
-		logger.debug("Entering excessive students removal from groups endpoint");
+		logger.info("Removing excessive students from groups");
 
 		for (int i = 0; i < NUMBER_OF_GROUPS; i++) {
 
@@ -129,7 +129,7 @@ public class DbInit {
 
 	public void assignCoursesRandomlyToStudents(Map<Integer, ArrayList<Integer>> studentsAndCourses) {
 		
-		logger.debug("Entering random course assigning to students endpoint");
+		logger.info("Assigning random courses to students");
 
 		for (int i = 0; i < studentsAndCourses.size(); i++) {
 
@@ -154,7 +154,7 @@ public class DbInit {
 	
 	public void clearDatabaseFacade() {
 		
-		logger.debug("Entering clearing of database facade endpoint");
+		logger.info("Clearing database facade");
 		
 		jdbcTemplate.update("truncate table students_courses, students, groups, courses");
 		jdbcTemplate.update("ALTER SEQUENCE students_student_id_seq RESTART WITH 1");
@@ -167,7 +167,7 @@ public class DbInit {
 	
 	public boolean checkIfDatabaseIsEmpty() {
 		
-		logger.debug("Entering check if database is empty endpoint");
+		logger.info("Checking if database is empty");
 
 		int rowCount = jdbcTemplate.queryForObject("select sum(n_live_tup) from pg_stat_user_tables", Integer.class);
 

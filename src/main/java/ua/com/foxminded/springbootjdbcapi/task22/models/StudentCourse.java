@@ -3,8 +3,11 @@ package ua.com.foxminded.springbootjdbcapi.task22.models;
 public class StudentCourse {
 	
 	private int studentId;
+	
 	private int courseId;
 
+	StudentCourse() {}
+	
 	public StudentCourse(int studentId, int courseId) {
 
 		this.studentId = studentId;

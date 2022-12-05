@@ -3,87 +3,73 @@ package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
-import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.GroupRowMapper;
 
 @Repository
 public class JdbcGroupDao {
 
-	private final JdbcTemplate jdbcTemplate;
-	private final GroupRowMapper groupRowMapper;
+	private final EntityManager entityManager;
 
-	public JdbcGroupDao(JdbcTemplate jdbcTemplate, GroupRowMapper groupRowMapper) {
+	public JdbcGroupDao(EntityManager entityManager) {
 
-		this.jdbcTemplate = jdbcTemplate;
-		this.groupRowMapper = groupRowMapper;
+		this.entityManager = entityManager;
 
 	}
 
 	public Optional<Group> getByName(String groupName) {
 
-		try {
-
-			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from groups where group_name = ?",
-					groupRowMapper, groupName));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Group group = entityManager.createQuery("select g from Group g where g.groupName = ?1", Group.class)
+				.setParameter(1, groupName).getSingleResult();
+		return Optional.ofNullable(group);
 
 	}
 
 	public Optional<Group> getById(int groupId) {
 
-		try {
-
-			return Optional.ofNullable(
-					jdbcTemplate.queryForObject("select * from groups where group_id = ?", groupRowMapper, groupId));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Group group = entityManager.find(Group.class, groupId);
+		return Optional.ofNullable(group);
 
 	}
 
 	public List<Group> getAll() {
 
-		return jdbcTemplate.query("select * from groups", groupRowMapper);
+		return entityManager.createQuery("select g from Group g", Group.class).getResultList();
 
 	}
 
+	@Transactional
 	public Group save(Group group) {
 
-		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
-		return jdbcTemplate.queryForObject("select * from groups order by group_id desc limit 1", groupRowMapper);
+		entityManager.persist(group);
+		return getById(group.getGroupId()).get();
 
 	}
 
+	@Transactional
 	public Group update(int groupId, String[] params) {
 
-		jdbcTemplate.update("update groups set group_name = ? where group_id = ?", params[0], groupId);
-		return jdbcTemplate.queryForObject("select * from groups where group_id = ?", groupRowMapper, groupId);
+		Group group = new Group(groupId, params[0]);
+		return entityManager.merge(group);
 
 	}
 
 	public void delete(int groupId) {
 
-		jdbcTemplate.update("delete from groups where group_id = ?", groupId);
+		Group group = entityManager.find(Group.class, groupId);
+		entityManager.remove(group);
 
 	}
 
 	public List<Group> findGroupsByStudentNumber(int studentNumber) {
 
-		return jdbcTemplate.query(
-				"SELECT groups.* FROM groups LEFT JOIN students ON groups.group_id = students.group_id GROUP BY groups.group_id HAVING COUNT(students.group_id) <= ?",
-				groupRowMapper, studentNumber);
+		return entityManager.createQuery(
+				"SELECT g FROM Group g LEFT JOIN Student s ON g.groupId = s.groupId GROUP BY g.groupId HAVING COUNT(s.groupId) <= ?1",
+				Group.class).setParameter(1, (long) studentNumber).getResultList();
 
 	}
 

@@ -3,10 +3,14 @@ package ua.com.foxminded.springbootjdbcapi.task22.daolayer;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
 import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentCourseRowMapper;
@@ -15,112 +19,78 @@ import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentRowMapper;
 @Repository
 public class JdbcStudentDao {
 
-	private final JdbcTemplate jdbcTemplate;
-	private final StudentRowMapper studentRowMapper;
-	private final StudentCourseRowMapper studentCourseRowMapper;
+	private final EntityManager entityManager;
 
-	public JdbcStudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper studentRowMapper,
-			StudentCourseRowMapper studentCourseRowMapper) {
+	public JdbcStudentDao(EntityManager entityManager) {
 
-		this.jdbcTemplate = jdbcTemplate;
-		this.studentRowMapper = studentRowMapper;
-		this.studentCourseRowMapper = studentCourseRowMapper;
+		this.entityManager = entityManager;
 
 	}
 
 	public Optional<Student> getByGroupId(int groupId) {
 
-		try {
-
-			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where group_id = ?",
-					studentRowMapper, groupId));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Student student = entityManager.createQuery("select s from Student s where s.groupId = ?1", Student.class)
+				.setParameter(1, groupId).getSingleResult();
+		return Optional.ofNullable(student);
 
 	}
 
 	public Optional<Student> getByFirstName(String firstName) {
 
-		try {
-
-			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where first_name = ?",
-					studentRowMapper, firstName));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Student student = entityManager.createQuery("select s from Student s where s.firstName = ?1", Student.class)
+				.setParameter(1, firstName).getSingleResult();
+		return Optional.ofNullable(student);
 
 	}
 
 	public Optional<Student> getByLastName(String lastName) {
 
-		try {
-
-			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where last_name = ?",
-					studentRowMapper, lastName));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Student student = entityManager.createQuery("select s from Student s where s.lastName = ?1", Student.class)
+				.setParameter(1, lastName).getSingleResult();
+		return Optional.ofNullable(student);
 
 	}
 
 	public Optional<Student> getById(int studentId) {
 
-		try {
-
-			return Optional.ofNullable(jdbcTemplate.queryForObject("select * from students where student_id = ?",
-					studentRowMapper, studentId));
-
-		} catch (EmptyResultDataAccessException e) {
-
-			return Optional.empty();
-
-		}
+		Student student = entityManager.find(Student.class, studentId);
+		return Optional.ofNullable(student);
 
 	}
 
 	public List<Student> getAll() {
 
-		return jdbcTemplate.query("select * from students", studentRowMapper);
+		return entityManager.createQuery("select s from Student s", Student.class).getResultList();
 
 	}
-
+	
+	@Transactional
 	public Student save(Student student) {
 
-		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
-				student.getGroupId(), student.getFirstName(), student.getLastName());
-		return jdbcTemplate.queryForObject("select * from students order by student_id desc limit 1", studentRowMapper);
+		entityManager.persist(student);
+		return getById(student.getStudentId()).get();
 
 	}
-
+	
+	@Transactional
 	public Student update(int studentId, String[] params) {
 
-		jdbcTemplate.update("update students set group_id = ?, first_name = ?, last_name = ? where student_id = ?",
-				Integer.parseInt(params[0]), params[1], params[2], studentId);
-		return jdbcTemplate.queryForObject("select * from students where student_id = ?", studentRowMapper, studentId);
+		Student student = new Student(studentId, Integer.parseInt(params[0]), params[1], params[2]);
+		return entityManager.merge(student);
 
 	}
 
 	public void delete(int studentId) {
 
-		jdbcTemplate.update("delete from students where student_id = ?", studentId);
-
+		Student student = entityManager.find(Student.class, studentId);
+		entityManager.remove(student);
 	}
 
 	public List<Student> findStudentsByCourse(String courseName) {
 
-		return jdbcTemplate.query(
-				"SELECT students.* FROM courses JOIN students_courses ON courses.course_id = students_courses.course_id JOIN students ON students_courses.student_id = students.student_id WHERE course_name = ?",
-				studentRowMapper, courseName);
+		return entityManager.createQuery(
+				"SELECT s FROM Course c JOIN students_courses sc ON c.courseId = sc.courseId JOIN Student s ON sc.studentId = s.studentId WHERE c.courseName = ?1",
+				Student.class).setParameter(1, courseName).getResultList();
 
 	}
 

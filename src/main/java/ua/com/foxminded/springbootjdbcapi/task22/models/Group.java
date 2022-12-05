@@ -1,10 +1,25 @@
 package ua.com.foxminded.springbootjdbcapi.task22.models;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "groups")
 public class Group {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int groupId;
+	
+	@Column(name = "GROUP_NAME")
 	private String groupName;
-
+	
+	public Group() {}
+	
 	public Group(int groupId, String groupName) {
 
 		this.groupId = groupId;

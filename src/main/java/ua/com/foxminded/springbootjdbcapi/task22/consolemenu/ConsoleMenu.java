@@ -27,8 +27,8 @@ public class ConsoleMenu {
 	}
 
 	public void runMenu() {
-		
-		logger.debug("Entering console menu run endpoint");
+
+		logger.info("Running console menu");
 
 		while (!exit) {
 
@@ -39,14 +39,14 @@ public class ConsoleMenu {
 		}
 
 		scanner.close();
-		
+
 		logger.info("Console menu has run");
 
 	}
 
 	private void printMenu() {
-		
-		logger.debug("Entering print menu endpoint");
+
+		logger.info("Printing menu");
 
 		System.out.println("\nWhat do you whant to do?");
 		System.out.println("1) Find all groups with less or equal students’ number;");
@@ -56,15 +56,14 @@ public class ConsoleMenu {
 		System.out.println("5) Add a student to the course (from a list);");
 		System.out.println("6) Remove the student from one of their courses;");
 		System.out.println("0) Exit.");
-		
+
 		logger.info("Menu has been printed");
 
 	}
 
 	private int getInput() {
 
-		logger.debug("Entering get input endpoint");
-		
+
 		int choice = -1;
 
 		while (choice < 0 || choice > NUMBER_OF_CHOICES) {
@@ -76,7 +75,7 @@ public class ConsoleMenu {
 
 			} catch (NumberFormatException e) {
 
-				logger.error("Unable to get input, message: " + e.getMessage(), e);
+				logger.error("Exception occurred during getting input, message. Exception: ", e);
 				System.out.println("Invalid choice. Please try again.");
 
 			}
@@ -89,8 +88,8 @@ public class ConsoleMenu {
 	}
 
 	private void performAction(int choice) {
-		
-		logger.debug("Entering action perfomance endpoint");
+
+		logger.info("Performing action");
 
 		switch (choice) {
 
@@ -135,7 +134,7 @@ public class ConsoleMenu {
 			System.out.println("An unknown error has occurred.");
 
 		}
-		
+
 		logger.info("Action has been performed");
 
 	}
