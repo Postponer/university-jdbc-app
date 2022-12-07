@@ -145,8 +145,8 @@ public class StudentService {
 
 		} catch (Exception e) {
 
-			logger.error("Exception occurred during student removal with id: {} from course with id: {}", studentId,
-					courseId);
+			logger.error("Exception occurred during student removal with id: {} from course with id: {}, message. Exception:", studentId,
+					courseId, e);
 			return false;
 
 		}

@@ -95,6 +95,20 @@ public class Student {
 
 	}
 
+	public void addCourse(Course course) {
+
+		courses.add(course);
+		course.getStudents().add(this);
+
+	}
+
+	public void removeCourse(Course course) {
+
+		courses.remove(course);
+		course.getStudents().remove(this);
+
+	}
+
 	@Override
 	public String toString() {
 		return "Student [studentId=" + studentId + ", groupId=" + groupId + ", firstName=" + firstName + ", lastName="

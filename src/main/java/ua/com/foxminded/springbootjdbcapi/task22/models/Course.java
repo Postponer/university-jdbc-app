@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.NaturalId;
+
 @Entity
 @Table(name = "courses")
 public class Course {
@@ -20,6 +22,7 @@ public class Course {
 	private int courseId;
 
 	@Column(name = "COURSE_NAME")
+	@NaturalId
 	private String courseName;
 
 	@Column(name = "COURSE_DESCRIPTION")
@@ -72,6 +75,12 @@ public class Course {
 
 		this.courseDescription = courseDescription;
 
+	}
+
+	public List<Student> getStudents() {
+		
+		return students;
+		
 	}
 
 	@Override

@@ -6,15 +6,12 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
+import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
-import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentCourseRowMapper;
-import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentRowMapper;
+import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCoursePK;
 
 @Repository
 public class JdbcStudentDao {
@@ -63,7 +60,7 @@ public class JdbcStudentDao {
 		return entityManager.createQuery("select s from Student s", Student.class).getResultList();
 
 	}
-	
+
 	@Transactional
 	public Student save(Student student) {
 
@@ -71,7 +68,7 @@ public class JdbcStudentDao {
 		return getById(student.getStudentId()).get();
 
 	}
-	
+
 	@Transactional
 	public Student update(int studentId, String[] params) {
 
@@ -84,28 +81,35 @@ public class JdbcStudentDao {
 
 		Student student = entityManager.find(Student.class, studentId);
 		entityManager.remove(student);
+		
 	}
 
 	public List<Student> findStudentsByCourse(String courseName) {
 
-		return entityManager.createQuery(
-				"SELECT s FROM Course c JOIN students_courses sc ON c.courseId = sc.courseId JOIN Student s ON sc.studentId = s.studentId WHERE c.courseName = ?1",
-				Student.class).setParameter(1, courseName).getResultList();
+		return entityManager
+				.createQuery("SELECT s FROM Student s JOIN s.courses c WHERE c.courseName = ?1", Student.class)
+				.setParameter(1, courseName).getResultList();
 
 	}
 
+	@Transactional
 	public StudentCourse addStudentToCourse(int studentId, int courseId) {
-
-		jdbcTemplate.update("INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)", studentId, courseId);
-		return jdbcTemplate.queryForObject("select * from students_courses where student_id = ? and course_id = ?",
-				studentCourseRowMapper, studentId, courseId);
-
+		
+		Student student = entityManager.find(Student.class, studentId);
+		Course course = entityManager.find(Course.class, courseId);
+		student.addCourse(course);
+		entityManager.persist(student);
+		return new StudentCourse(new StudentCoursePK(studentId, courseId));
+		
 	}
 
+	@Transactional
 	public void removeStudentFromCourse(int studentId, int courseId) {
 
-		jdbcTemplate.update("DELETE FROM students_courses WHERE student_id = ? AND course_id = ?", studentId, courseId);
-
+		Course course = entityManager.find(Course.class, courseId);
+		Student student = entityManager.find(Student.class, studentId);
+		student.removeCourse(course);
+		
 	}
 
 }

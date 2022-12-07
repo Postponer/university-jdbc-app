@@ -7,11 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
@@ -25,54 +27,70 @@ class JdbcStudentDaoTest {
 
 	private JdbcStudentDao studentDao;
 	private JdbcCourseDao courseDao;
-	private JdbcTemplate jdbcTemplate;
+	private EntityManager entityManager;
 
 	@Autowired
-	public JdbcStudentDaoTest(JdbcStudentDao studentDao, JdbcCourseDao courseDao, JdbcTemplate jdbcTemplate) {
+	public JdbcStudentDaoTest(JdbcStudentDao studentDao, JdbcCourseDao courseDao, EntityManager entityManager) {
 
 		this.studentDao = studentDao;
 		this.courseDao = courseDao;
-		this.jdbcTemplate = jdbcTemplate;
+		this.entityManager = entityManager;
 
 	}
 
 	@BeforeEach
 	void reset() {
 
-		jdbcTemplate.update("truncate table students_courses, students, courses");
-		jdbcTemplate.update("ALTER SEQUENCE students_student_id_seq RESTART WITH 1");
+		entityManager.createNativeQuery("truncate table students_courses, students, courses").executeUpdate();
+		entityManager.createNativeQuery("ALTER SEQUENCE students_student_id_seq RESTART WITH 1").executeUpdate();
 
 
 	}
 
 	@Test
+	@Transactional
 	void testGetAllForStudents_shouldCheckIfTableIsEmpty_whenMethodIsExecuted() {
-
+		
 		assertThat(studentDao.getAll()).hasSize(0);
 
 	}
 
 	@Test
+	@Transactional
 	void testSaveForStudents_shouldCheckIfStudentHasBeenSaved_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 1, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(1);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		assertThat(studentDao.getAll()).hasSize(1);
 
 	}
 
 	@Test
+	@Transactional
 	void testDeleteForStudents_shouldCheckIfStudentHasBeenDeleted_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 2, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(2);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		studentDao.delete(1);
 		assertThat(studentDao.getAll()).hasSize(0);
 
 	}
 
 	@Test
+	@Transactional
 	void testGetByIdForStudents_shouldCheckIfStudentHasBeenFoundById_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 3, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(3);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		Optional<Student> result = studentDao.getById(1);
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -83,9 +101,14 @@ class JdbcStudentDaoTest {
 	}
 
 	@Test
+	@Transactional
 	void testUpdateForStudents_shouldCheckIfStudentHasBeenUpdated_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 4, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(4);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		String[] params = { "99", "UPDATED", "UPDATED" };
 		studentDao.update(1, params);
 		Optional<Student> result = studentDao.getById(1);
@@ -98,9 +121,14 @@ class JdbcStudentDaoTest {
 	}
 
 	@Test
+	@Transactional
 	void testGetByFirstNameForStudents_shouldCheckIfStudentHasBeenFoundByFirstName_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 5, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(5);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		Optional<Student> result = studentDao.getByFirstName("John");
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -111,9 +139,14 @@ class JdbcStudentDaoTest {
 	}
 
 	@Test
+	@Transactional
 	void testGetByLastNameForStudents_shouldCheckIfStudentHasBeenFoundByLastName_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 6, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(6);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		Optional<Student> result = studentDao.getByLastName("Doe");
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -124,9 +157,14 @@ class JdbcStudentDaoTest {
 	}
 
 	@Test
+	@Transactional
 	void testGetByGroupIdForStudents_shouldCheckIfStudentHasBeenFoundByGroupId_whenMethodIsExecuted() {
 
-		studentDao.save(new Student(1, 7, "John", "Doe"));
+		Student student = new Student();
+		student.setGroupId(7);
+		student.setFirstName("John");
+		student.setLastName("Doe");
+		studentDao.save(student);
 		Optional<Student> result = studentDao.getByGroupId(7);
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -137,11 +175,23 @@ class JdbcStudentDaoTest {
 	}
 
 	@Test
+	@Transactional
 	void testFindStudentsByCourse_shouldReturnAllStudentsRelatedToCourse_whenArgumentIsCourseName() {
-
-		courseDao.save(new Course(1, "Math", "Math Course"));
-		studentDao.save(new Student(1, 8, "John", "Doe"));
-		studentDao.save(new Student(2, 9, "Jane", "Miller"));
+		
+		Course course = new Course();
+		course.setCourseName("Math");
+		course.setCourseDescription("Math Course");
+		courseDao.save(course);
+		Student student1 = new Student();
+		student1.setGroupId(8);
+		student1.setFirstName("John");
+		student1.setLastName("Doe");
+		studentDao.save(student1);
+		Student student2 = new Student();
+		student2.setGroupId(9);
+		student2.setFirstName("Jane");
+		student2.setLastName("Miller");
+		studentDao.save(student2);
 		studentDao.addStudentToCourse(1, 1);
 		studentDao.addStudentToCourse(2, 1);
 		List<Student> results = studentDao.findStudentsByCourse("Math");

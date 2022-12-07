@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
+import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCoursePK;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -138,22 +139,9 @@ class StudentServiceTest {
 	}
 
 	@Test
-	void testDeleteWhenOptionalIsEmpty() {
+	void testDelete() {
 
-		Mockito.when(studentDao.getById(Mockito.any(Integer.class))).thenReturn(Optional.empty());
 		assertEquals(true, studentService.delete(1));
-		Mockito.verify(studentDao).getById(Mockito.any(Integer.class));
-
-	}
-
-	@Test
-	void testDeleteWhenOptionalIsNotEmpty() {
-
-		Student student = new Student(1, 8, "John", "Doe");
-		Optional<Student> optionalStudent = Optional.of(student);
-		Mockito.when(studentDao.getById(Mockito.any(Integer.class))).thenReturn(optionalStudent);
-		assertEquals(false, studentService.delete(1));
-		Mockito.verify(studentDao).getById(Mockito.any(Integer.class));
 
 	}
 
@@ -174,7 +162,7 @@ class StudentServiceTest {
 	@Test
 	void testAddStudentToCourse() {
 
-		StudentCourse studentCourse = new StudentCourse(1, 1);
+		StudentCourse studentCourse = new StudentCourse(new StudentCoursePK(1, 1));
 		Mockito.when(studentDao.addStudentToCourse(Mockito.any(Integer.class), Mockito.any(Integer.class)))
 				.thenReturn(studentCourse);
 		assertThat(studentService.addStudentToCourse(1, 1)).isEqualTo(studentCourse);
