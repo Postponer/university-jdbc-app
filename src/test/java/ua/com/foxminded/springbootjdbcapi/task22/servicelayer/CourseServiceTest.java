@@ -116,22 +116,9 @@ class CourseServiceTest {
 	}
 
 	@Test
-	void testDeleteWhenOptionalIsEmpty() {
+	void testDelete() {
 
-		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(Optional.empty());
 		assertEquals(true, courseService.delete(1));
-		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
-
-	}
-
-	@Test
-	void testDeleteWhenOptionalIsNotEmpty() {
-
-		Course course = new Course(1, "Math", "Math course");
-		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(optionalCourse);
-		assertEquals(false, courseService.delete(1));
-		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
 
 	}
 

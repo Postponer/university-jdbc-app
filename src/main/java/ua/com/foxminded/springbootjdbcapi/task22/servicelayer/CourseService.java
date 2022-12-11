@@ -23,9 +23,9 @@ public class CourseService {
 
 	public Course getByName(String courseName) {
 
-		logger.debug("Entering get course by name endpoint");
-		Course course = courseDao.getByName(courseName).get();
-		logger.info(course.toString() + " has been gotten by name: " + courseName);
+		logger.debug("Getting course by name: {}", courseName);
+		Course course = courseDao.getByName(courseName).orElse(null);
+		logger.info("{} has been gotten by name: {}", course, courseName);
 
 		return course;
 
@@ -33,9 +33,9 @@ public class CourseService {
 
 	public Course getByDescription(String courseDescription) {
 
-		logger.debug("Entering get course by description endpoint");
-		Course course = courseDao.getByDescription(courseDescription).get();
-		logger.info(course.toString() + " has been gotten by description: " + courseDescription);
+		logger.debug("Getting course by description: {}", courseDescription);
+		Course course = courseDao.getByDescription(courseDescription).orElse(null);
+		logger.info("{} has been gotten by description: {}", course, courseDescription);
 
 		return course;
 
@@ -43,9 +43,9 @@ public class CourseService {
 
 	public Course getById(int courseId) {
 
-		logger.debug("Entering get course by id endpoint");
-		Course course = courseDao.getById(courseId).get();
-		logger.info(course.toString() + " has been gotten by id: " + courseId);
+		logger.debug("Getting course by id: {}", courseId);
+		Course course = courseDao.getById(courseId).orElse(null);
+		logger.info("{} has been gotten by id: {}", course, courseId);
 
 		return course;
 
@@ -53,7 +53,7 @@ public class CourseService {
 
 	public List<Course> getAll() {
 
-		logger.debug("Entering get all courses endpoint");
+		logger.debug("Getting all courses");
 		List<Course> courseList = courseDao.getAll();
 		logger.info("All courses have been gotten");
 
@@ -63,9 +63,9 @@ public class CourseService {
 
 	public Course save(Course course) {
 
-		logger.debug("Entering save course endpoint");
+		logger.debug("Saving {}", course);
 		Course savedCourse = courseDao.save(course);
-		logger.info(course.toString() + " has been saved");
+		logger.info("{} has been saved", course);
 
 		return savedCourse;
 
@@ -73,9 +73,9 @@ public class CourseService {
 
 	public Course update(int courseId, String[] params) {
 
-		logger.debug("Entering update course endpoint");
+		logger.debug("Updating course with id: {} with this parameters: {}", courseId, params);
 		Course course = courseDao.update(courseId, params);
-		logger.info("Course with id: " + courseId + " has been updated with this parameters: " + params);
+		logger.info("Course with id: {} has been updated with this parameters: {}", courseId, params);
 
 		return course;
 
@@ -83,22 +83,20 @@ public class CourseService {
 
 	public boolean delete(int courseId) {
 
-		logger.debug("Entering delete course endpoint");
-		courseDao.delete(courseId);
+		logger.debug("Deleting course with id: {}", courseId);
 
 		try {
 
-			getById(courseId);
-			logger.info("Course with id: " + courseId + " has been deleted");
+			courseDao.delete(courseId);
+			logger.info("Course with id: {} has been deleted", courseId);
+			return true;
 
 		} catch (Exception e) {
 
-			return true;
+			logger.error("Exception occurred during course deletion by id: {}, message. Exception: ", courseId, e);
+			return false;
 
 		}
-
-		logger.error("Unable to delete course with id: " + courseId);
-		return false;
 
 	}
 

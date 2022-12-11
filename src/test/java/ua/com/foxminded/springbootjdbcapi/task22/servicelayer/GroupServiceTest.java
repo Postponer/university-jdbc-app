@@ -96,23 +96,10 @@ class GroupServiceTest {
 	}
 
 	@Test
-	void testDeleteWhenOptionalIsEmpty() {
+	void testDelete() {
 
-		Mockito.when(groupDao.getById(Mockito.any(Integer.class))).thenReturn(Optional.empty());
 		assertEquals(true, groupService.delete(1));
-		Mockito.verify(groupDao).getById(Mockito.any(Integer.class));
-
-	}
-
-	@Test
-	void testDeleteWhenOptionalIsNotEmpty() {
-
-		Group group = new Group(1, "AA-06");
-		Optional<Group> optionalGroup = Optional.of(group);
-		Mockito.when(groupDao.getById(Mockito.any(Integer.class))).thenReturn(optionalGroup);
-		assertEquals(false, groupService.delete(1));
-		Mockito.verify(groupDao).getById(Mockito.any(Integer.class));
-
+		
 	}
 
 	@Test

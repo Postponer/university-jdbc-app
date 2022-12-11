@@ -5,37 +5,30 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
 import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
-import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentCourseRowMapper;
 
 @Service
 public class StudentService {
 
 	private JdbcStudentDao studentDao;
-	private JdbcTemplate jdbcTemplate;
-	private StudentCourseRowMapper studentCourseRowMapper;
 	private Scanner scanner = new Scanner(System.in);
 	Logger logger = LoggerFactory.getLogger(StudentService.class);
 
-	public StudentService(JdbcStudentDao studentDao, JdbcTemplate jdbcTemplate,
-			StudentCourseRowMapper studentCourseRowMapper) {
+	public StudentService(JdbcStudentDao studentDao) {
 
 		this.studentDao = studentDao;
-		this.jdbcTemplate = jdbcTemplate;
-		this.studentCourseRowMapper = studentCourseRowMapper;
 
 	}
 
 	public Student getByGroupId(int groupId) {
 
-		logger.debug("Entering get student by group id endpoint");
-		Student student = studentDao.getByGroupId(groupId).get();
-		logger.info(student.toString() + " has been gotten by group id: " + groupId);
+		logger.info("Getting student by group id: {}", groupId);
+		Student student = studentDao.getByGroupId(groupId).orElse(null);
+		logger.info("{} has been gotten by group id: {}", student, groupId);
 
 		return student;
 
@@ -43,9 +36,9 @@ public class StudentService {
 
 	public Student getByFirstName(String firstName) {
 
-		logger.debug("Entering get student by first name endpoint");
-		Student student = studentDao.getByFirstName(firstName).get();
-		logger.info(student.toString() + " has been gotten by first name: " + firstName);
+		logger.info("Getting student by first name: {}", firstName);
+		Student student = studentDao.getByFirstName(firstName).orElse(null);
+		logger.info("{} has been gotten by first name: {}", student, firstName);
 
 		return student;
 
@@ -53,9 +46,9 @@ public class StudentService {
 
 	public Student getByLastName(String lastName) {
 
-		logger.debug("Entering get student by last name endpoint");
-		Student student = studentDao.getByLastName(lastName).get();
-		logger.info(student.toString() + " has been gotten by last name: " + lastName);
+		logger.info("Getting student by last name: {}", lastName);
+		Student student = studentDao.getByLastName(lastName).orElse(null);
+		logger.info("{} has been gotten by last name: {}", student, lastName);
 
 		return student;
 
@@ -63,9 +56,9 @@ public class StudentService {
 
 	public Student getById(int studentId) {
 
-		logger.debug("Entering get student by id endpoint");
-		Student student = studentDao.getById(studentId).get();
-		logger.info(student.toString() + " has been gotten by id: " + studentId);
+		logger.info("Getting student by id: {}", studentId);
+		Student student = studentDao.getById(studentId).orElse(null);
+		logger.info("{} has been gotten by id: {}", student, studentId);
 
 		return student;
 
@@ -73,7 +66,7 @@ public class StudentService {
 
 	public List<Student> getAll() {
 
-		logger.debug("Entering get all students endpoint");
+		logger.info("Getting all students");
 		List<Student> studentList = studentDao.getAll();
 		logger.info("All courses have been gotten");
 
@@ -83,9 +76,9 @@ public class StudentService {
 
 	public Student save(Student student) {
 
-		logger.debug("Entering save student endpoint");
+		logger.info("Saving {}", student);
 		Student savedStudent = studentDao.save(student);
-		logger.info(student.toString() + " has been saved");
+		logger.info("{} has been saved", student);
 
 		return savedStudent;
 
@@ -93,9 +86,9 @@ public class StudentService {
 
 	public Student update(int studentId, String[] params) {
 
-		logger.debug("Entering update student endpoint");
+		logger.info("Updating student with id: {} with this parameters: {}", studentId, params);
 		Student student = studentDao.update(studentId, params);
-		logger.info("Student with id: " + studentId + " has been updated with this parameters: " + params);
+		logger.info("Student with id: {} has been updated with this parameters: {}", studentId, params);
 
 		return student;
 
@@ -103,30 +96,28 @@ public class StudentService {
 
 	public boolean delete(int studentId) {
 
-		logger.debug("Entering delete student endpoint");
-		studentDao.delete(studentId);
+		logger.info("Deleting student with id: {}", studentId);
 
 		try {
 
-			getById(studentId);
-			logger.info("Student with id: " + studentId + " has been deleted");
+			studentDao.delete(studentId);
+			logger.info("Student with id: {} has been deleted", studentId);
+			return true;
 
 		} catch (Exception e) {
 
-			return true;
+			logger.error("Exception occurred during student deletion by id: {}, message. Exception: ", studentId, e);
+			return false;
 
 		}
-		
-		logger.error("Unable to delete student with id: " + studentId);
-		return false;
 
 	}
 
 	public List<Student> findStudentsByCourse(String courseName) {
 
-		logger.debug("Entering find students by course endpoint");
+		logger.info("Finding students by course: {}", courseName);
 		List<Student> studentList = studentDao.findStudentsByCourse(courseName);
-		logger.info("Students have been found by course: " + courseName);
+		logger.info("Students have been found by course: {}", courseName);
 
 		return studentList;
 
@@ -134,9 +125,9 @@ public class StudentService {
 
 	public StudentCourse addStudentToCourse(int studentId, int courseId) {
 
-		logger.debug("Entering add student to course endpoint");
+		logger.info("Adding student with id: {} to course with id {}", studentId, courseId);
 		StudentCourse studentCourse = studentDao.addStudentToCourse(studentId, courseId);
-		logger.info("Student with id: " + studentId + " has been added to course with id: " + courseId);
+		logger.info("Student with id: {} has been added to course with id: {}", studentId, courseId);
 
 		return studentCourse;
 
@@ -144,41 +135,39 @@ public class StudentService {
 
 	public boolean removeStudentFromCourse(int studentId, int courseId) {
 
-		logger.debug("Entering remove student from course endpoint");
-		studentDao.removeStudentFromCourse(studentId, courseId);
+		logger.info("Removing student with id: {} from course with id: {}", studentId, courseId);
 
 		try {
 
-			jdbcTemplate.queryForObject("select * from students_courses where student_id = ? and course_id = ?",
-					studentCourseRowMapper, studentId, courseId);
-			logger.info("Student with id: " + studentId + " has been removed from course with id: " + courseId);
+			studentDao.removeStudentFromCourse(studentId, courseId);
+			logger.info("Student with id: {} has been removed from course with id: {}", studentId, courseId);
+			return true;
 
 		} catch (Exception e) {
 
-			return true;
+			logger.error("Exception occurred during student removal with id: {} from course with id: {}, message. Exception:", studentId,
+					courseId, e);
+			return false;
 
 		}
-
-		logger.error("Unable to remove student with id: " + studentId + "from course with id: " + courseId);
-		return false;
 
 	}
 
 	public void findStudentsByCourse() {
 
-		logger.debug("Entering find students by course in console menu endpoint");
+		logger.info("Finding students by course in console menu");
 		String courseName;
 
 		System.out.println("Please enter name of the course: ");
 		courseName = scanner.nextLine();
 		System.out.println(findStudentsByCourse(courseName));
-		logger.info("Students have been found by course: " + courseName + " in console menu");
+		logger.info("Students have been found by course: {} in console menu", courseName);
 
 	}
 
 	public void addNewStudent() {
 
-		logger.debug("Entering add new student in console menu endpoint");
+		logger.info("Adding new student in console menu");
 
 		try {
 
@@ -196,7 +185,7 @@ public class StudentService {
 
 		} catch (NumberFormatException e) {
 
-			logger.error("Unable to add new student in console menu, message: " + e.getMessage(), e);
+			logger.error("Exception occurred during adding new student in console menu, message. Exception: ", e);
 			System.out.println("Invalid input. Please use numbers.");
 
 		}
@@ -205,7 +194,8 @@ public class StudentService {
 
 	public void deleteStudent() {
 
-		logger.debug("Entering delete student in console menu endpoint");
+		logger.info("Deleting student in console menu");
+
 		try {
 
 			System.out.println("Please enter student_id: ");
@@ -216,7 +206,7 @@ public class StudentService {
 
 		} catch (NumberFormatException e) {
 
-			logger.error("Unable to delete student in console menu, message: " + e.getMessage(), e);
+			logger.error("Exception occurred during student deletion in console menu, message. Exception: ", e);
 			System.out.println("Invalid input. Please use numbers.");
 
 		}
@@ -225,7 +215,7 @@ public class StudentService {
 
 	public void addStudentToCourse() {
 
-		logger.debug("Entering add student to course in console menu endpoint");
+		logger.info("Adding student to course in console menu");
 
 		try {
 
@@ -236,12 +226,12 @@ public class StudentService {
 			int courseId = Integer.parseInt(scanner.nextLine());
 
 			addStudentToCourse(studentId, courseId);
-			logger.info("Student with id: " + studentId + " has been added to course with id: " + courseId
-					+ " in console menu");
+			logger.info("Student with id: {} has been added to course with id: {} in console menu", studentId,
+					courseId);
 
 		} catch (NumberFormatException e) {
 
-			logger.error("Unable to add student to course in console menu, message: " + e.getMessage(), e);
+			logger.error("Exception occurred during student adding to course in console menu, message. Exception: ", e);
 			System.out.println("Invalid input. Please use numbers.");
 
 		}
@@ -250,7 +240,7 @@ public class StudentService {
 
 	public void removeStudentFromCourse() {
 
-		logger.debug("Entering remove student from course in console menu endpoint");
+		logger.info("Removing student from course in console menu");
 
 		try {
 
@@ -261,12 +251,13 @@ public class StudentService {
 			int courseId = Integer.parseInt(scanner.nextLine());
 
 			removeStudentFromCourse(studentId, courseId);
-			logger.info("Student with id: " + studentId + " has been removed from course with id: " + courseId
-					+ " in console menu");
+			logger.info("Student with id: {} has been removed from course with id: {} in console menu", studentId,
+					courseId);
 
 		} catch (NumberFormatException e) {
 
-			logger.error("Unable remove student from course in console menu, message: " + e.getMessage(), e);
+			logger.error("Exception occurred during student removal from course in console menu, message. Exception: ",
+					e);
 			System.out.println("Invalid input. Please use numbers.");
 
 		}

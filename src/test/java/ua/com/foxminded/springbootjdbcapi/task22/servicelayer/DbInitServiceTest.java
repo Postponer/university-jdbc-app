@@ -2,6 +2,8 @@ package ua.com.foxminded.springbootjdbcapi.task22.servicelayer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +36,7 @@ class DbInitServiceTest {
 	}
 
 	@Test
+	@Transactional
 	void testInitDB() {
 
 		assertThat(courseDao.getAll()).hasSize(10);

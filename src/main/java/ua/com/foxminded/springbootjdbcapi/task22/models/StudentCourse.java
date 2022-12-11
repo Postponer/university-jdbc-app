@@ -1,44 +1,44 @@
 package ua.com.foxminded.springbootjdbcapi.task22.models;
 
-public class StudentCourse {
-	
-	private int studentId;
-	private int courseId;
+import java.io.Serializable;
 
-	public StudentCourse(int studentId, int courseId) {
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-		this.studentId = studentId;
-		this.courseId = courseId;
+@Entity
+@Table(name = "students_courses")
+public class StudentCourse implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@EmbeddedId
+	private StudentCoursePK id;
+
+	StudentCourse() {
+	}
+
+	public StudentCourse(StudentCoursePK id) {
+
+		this.id = id;
 
 	}
 
-	public int getStudentId() {
+	public StudentCoursePK getId() {
 
-		return studentId;
-
-	}
-
-	public void setStudentId(int studentId) {
-
-		this.studentId = studentId;
-
-	}
-	
-	public int getCourseId() {
-
-		return courseId;
+		return id;
 
 	}
 
-	public void setCourseId(int courseId) {
+	public void setId(StudentCoursePK id) {
 
-		this.courseId = courseId;
+		this.id = id;
 
 	}
 
 	@Override
 	public String toString() {
-		return "StudentCourse [studentId=" + studentId + ", courseId=" + courseId + "]";
+		return "StudentCourse [studentId=" + id + "]";
 	}
 
 }
