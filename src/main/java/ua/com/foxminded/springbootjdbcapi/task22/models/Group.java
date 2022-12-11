@@ -1,10 +1,12 @@
 package ua.com.foxminded.springbootjdbcapi.task22.models;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -14,12 +16,16 @@ public class Group {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int groupId;
-	
+
 	@Column(name = "GROUP_NAME")
 	private String groupName;
-	
-	public Group() {}
-	
+
+	@OneToOne(targetEntity = Student.class, cascade = CascadeType.ALL)
+	private Student student;
+
+	public Group() {
+	}
+
 	public Group(int groupId, String groupName) {
 
 		this.groupId = groupId;
@@ -48,6 +54,18 @@ public class Group {
 	public void setGroupName(String groupName) {
 
 		this.groupName = groupName;
+
+	}
+
+	public Student getStudent() {
+
+		return student;
+
+	}
+
+	public void setStudent(Student student) {
+
+		this.student = student;
 
 	}
 

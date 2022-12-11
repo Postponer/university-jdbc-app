@@ -8,33 +8,39 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.StudentRowMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = { Config.class, Application.class })
-class JdbcStudentDaoTest {
+class StudentDaoTest {
 
-	private JdbcStudentDao studentDao;
-	private JdbcCourseDao courseDao;
+	private StudentDao studentDao;
+	private final JdbcTemplate jdbcTemplate;
+	private final StudentRowMapper studentRowMapper;
+
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Autowired
-	public JdbcStudentDaoTest(JdbcStudentDao studentDao, JdbcCourseDao courseDao, EntityManager entityManager) {
+	public StudentDaoTest(JdbcTemplate jdbcTemplate, StudentRowMapper studentRowMapper, StudentDao studentDao) {
 
+		this.jdbcTemplate = jdbcTemplate;
+		this.studentRowMapper = studentRowMapper;
 		this.studentDao = studentDao;
-		this.courseDao = courseDao;
-		this.entityManager = entityManager;
 
 	}
 
@@ -44,14 +50,13 @@ class JdbcStudentDaoTest {
 		entityManager.createNativeQuery("truncate table students_courses, students, courses").executeUpdate();
 		entityManager.createNativeQuery("ALTER SEQUENCE students_student_id_seq RESTART WITH 1").executeUpdate();
 
-
 	}
 
 	@Test
 	@Transactional
 	void testGetAllForStudents_shouldCheckIfTableIsEmpty_whenMethodIsExecuted() {
-		
-		assertThat(studentDao.getAll()).hasSize(0);
+
+		assertThat(studentDao.getAll()).isEmpty();
 
 	}
 
@@ -64,7 +69,7 @@ class JdbcStudentDaoTest {
 		student.setFirstName("John");
 		student.setLastName("Doe");
 		studentDao.save(student);
-		assertThat(studentDao.getAll()).hasSize(1);
+		assertThat(jdbcTemplate.query("select * from students", studentRowMapper)).hasSize(1);
 
 	}
 
@@ -76,9 +81,10 @@ class JdbcStudentDaoTest {
 		student.setGroupId(2);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
 		studentDao.delete(1);
-		assertThat(studentDao.getAll()).hasSize(0);
+		assertThat(jdbcTemplate.query("select * from students", studentRowMapper)).isEmpty();
 
 	}
 
@@ -90,7 +96,8 @@ class JdbcStudentDaoTest {
 		student.setGroupId(3);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
 		Optional<Student> result = studentDao.getById(1);
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -108,10 +115,11 @@ class JdbcStudentDaoTest {
 		student.setGroupId(4);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
-		String[] params = { "99", "UPDATED", "UPDATED" };
-		studentDao.update(1, params);
-		Optional<Student> result = studentDao.getById(1);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
+		studentDao.update(1, 99, "UPDATED", "UPDATED");
+		Optional<Student> result = Optional.ofNullable(
+				jdbcTemplate.queryForObject("select * from students where student_id = ?", studentRowMapper, 1));
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
 		assertEquals(99, result.get().getGroupId());
@@ -128,7 +136,8 @@ class JdbcStudentDaoTest {
 		student.setGroupId(5);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
 		Optional<Student> result = studentDao.getByFirstName("John");
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -146,7 +155,8 @@ class JdbcStudentDaoTest {
 		student.setGroupId(6);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
 		Optional<Student> result = studentDao.getByLastName("Doe");
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -164,7 +174,8 @@ class JdbcStudentDaoTest {
 		student.setGroupId(7);
 		student.setFirstName("John");
 		student.setLastName("Doe");
-		studentDao.save(student);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student.getGroupId(), student.getFirstName(), student.getLastName());
 		Optional<Student> result = studentDao.getByGroupId(7);
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getStudentId());
@@ -177,21 +188,24 @@ class JdbcStudentDaoTest {
 	@Test
 	@Transactional
 	void testFindStudentsByCourse_shouldReturnAllStudentsRelatedToCourse_whenArgumentIsCourseName() {
-		
+
 		Course course = new Course();
 		course.setCourseName("Math");
 		course.setCourseDescription("Math Course");
-		courseDao.save(course);
+		jdbcTemplate.update("insert into courses (course_name, course_description) values (?, ?)",
+				course.getCourseName(), course.getCourseDescription());
 		Student student1 = new Student();
 		student1.setGroupId(8);
 		student1.setFirstName("John");
 		student1.setLastName("Doe");
-		studentDao.save(student1);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student1.getGroupId(), student1.getFirstName(), student1.getLastName());
 		Student student2 = new Student();
 		student2.setGroupId(9);
 		student2.setFirstName("Jane");
 		student2.setLastName("Miller");
-		studentDao.save(student2);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student2.getGroupId(), student2.getFirstName(), student2.getLastName());
 		studentDao.addStudentToCourse(1, 1);
 		studentDao.addStudentToCourse(2, 1);
 		List<Student> results = studentDao.findStudentsByCourse("Math");

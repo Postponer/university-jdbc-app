@@ -7,17 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.GroupDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 
 @Service
 public class GroupService {
 
-	private JdbcGroupDao groupDao;
+	private GroupDao groupDao;
 	private Scanner scanner = new Scanner(System.in);
 	Logger logger = LoggerFactory.getLogger(GroupService.class);
 
-	public GroupService(JdbcGroupDao groupDao) {
+	public GroupService(GroupDao groupDao) {
 
 		this.groupDao = groupDao;
 
@@ -56,18 +56,20 @@ public class GroupService {
 	public Group save(Group group) {
 
 		logger.info("Saving {}", group);
-		Group savedGroup = groupDao.save(group);
+		groupDao.save(group.getGroupName());
+		Group savedGroup = groupDao.getById(group.getGroupId()).orElse(null);
 		logger.info("{} has been saved", group);
 
 		return savedGroup;
 
 	}
 
-	public Group update(int groupId, String[] params) {
+	public Group update(int groupId, String groupName) {
 
-		logger.info("Updating group with id: {} with this parameters: {}", groupId, params);
-		Group group = groupDao.update(groupId, params);
-		logger.info("Group with id: {} has been updated with this parameters: {}", groupId, params);
+		logger.info("Updating group with id: {} with this parameter: {}", groupId, groupName);
+		groupDao.update(groupId, groupName);
+		Group group = groupDao.getById(groupId).orElse(null);
+		logger.info("Group with id: {} has been updated with this parameter: {}", groupId, groupName);
 
 		return group;
 

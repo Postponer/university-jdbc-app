@@ -6,16 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.CourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 
 @Service
 public class CourseService {
 
-	private JdbcCourseDao courseDao;
+	private CourseDao courseDao;
 	Logger logger = LoggerFactory.getLogger(CourseService.class);
 
-	public CourseService(JdbcCourseDao courseDao) {
+	public CourseService(CourseDao courseDao) {
 
 		this.courseDao = courseDao;
 
@@ -64,18 +64,20 @@ public class CourseService {
 	public Course save(Course course) {
 
 		logger.debug("Saving {}", course);
-		Course savedCourse = courseDao.save(course);
+		courseDao.save(course.getCourseName(), course.getCourseDescription());
+		Course savedCourse = courseDao.getById(course.getCourseId()).orElse(null);
 		logger.info("{} has been saved", course);
 
 		return savedCourse;
 
 	}
 
-	public Course update(int courseId, String[] params) {
+	public Course update(int courseId, String courseName, String courseDescription) {
 
-		logger.debug("Updating course with id: {} with this parameters: {}", courseId, params);
-		Course course = courseDao.update(courseId, params);
-		logger.info("Course with id: {} has been updated with this parameters: {}", courseId, params);
+		logger.debug("Updating course with id: {} with this parameters: {}", courseId, courseName + ", " + courseDescription);
+		courseDao.update(courseId, courseName, courseDescription);
+		Course course = courseDao.getById(courseId).orElse(null);
+		logger.info("Course with id: {} has been updated with this parameters: {}", courseId, courseName + ", " + courseDescription);
 
 		return course;
 

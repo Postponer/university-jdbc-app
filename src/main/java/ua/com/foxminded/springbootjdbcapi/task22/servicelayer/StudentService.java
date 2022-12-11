@@ -7,18 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.StudentDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
-import ua.com.foxminded.springbootjdbcapi.task22.models.StudentCourse;
 
 @Service
 public class StudentService {
 
-	private JdbcStudentDao studentDao;
+	private StudentDao studentDao;
 	private Scanner scanner = new Scanner(System.in);
 	Logger logger = LoggerFactory.getLogger(StudentService.class);
 
-	public StudentService(JdbcStudentDao studentDao) {
+	public StudentService(StudentDao studentDao) {
 
 		this.studentDao = studentDao;
 
@@ -77,18 +76,20 @@ public class StudentService {
 	public Student save(Student student) {
 
 		logger.info("Saving {}", student);
-		Student savedStudent = studentDao.save(student);
+		studentDao.save(student.getGroupId(), student.getFirstName(), student.getLastName());
+		Student savedStudent = studentDao.getById(student.getStudentId()).orElse(null);
 		logger.info("{} has been saved", student);
 
 		return savedStudent;
 
 	}
 
-	public Student update(int studentId, String[] params) {
+	public Student update(int studentId, int groupId, String firstName, String lastName) {
 
-		logger.info("Updating student with id: {} with this parameters: {}", studentId, params);
-		Student student = studentDao.update(studentId, params);
-		logger.info("Student with id: {} has been updated with this parameters: {}", studentId, params);
+		logger.info("Updating student with id: {} with this parameters: {}", studentId, groupId + ", " + firstName + ", " + lastName);
+		studentDao.update(studentId, groupId, firstName, lastName);
+		Student student = studentDao.getById(studentId).orElse(null);
+		logger.info("Student with id: {} has been updated with this parameters: {}", studentId, groupId + ", " + firstName + ", " + lastName);
 
 		return student;
 
@@ -123,13 +124,11 @@ public class StudentService {
 
 	}
 
-	public StudentCourse addStudentToCourse(int studentId, int courseId) {
+	public void addStudentToCourse(int studentId, int courseId) {
 
 		logger.info("Adding student with id: {} to course with id {}", studentId, courseId);
-		StudentCourse studentCourse = studentDao.addStudentToCourse(studentId, courseId);
+		studentDao.addStudentToCourse(studentId, courseId);
 		logger.info("Student with id: {} has been added to course with id: {}", studentId, courseId);
-
-		return studentCourse;
 
 	}
 

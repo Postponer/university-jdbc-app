@@ -8,33 +8,39 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Group;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Student;
+import ua.com.foxminded.springbootjdbcapi.task22.rowmappers.GroupRowMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = { Config.class, Application.class })
-class JdbcGroupDaoTest {
+class GroupDaoTest {
 
-	private JdbcGroupDao groupDao;
-	private JdbcStudentDao studentDao;
+	private GroupDao groupDao;
+	private final JdbcTemplate jdbcTemplate;
+	private final GroupRowMapper groupRowMapper;
+
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Autowired
-	public JdbcGroupDaoTest(JdbcGroupDao groupDao, JdbcStudentDao studentDao, EntityManager entityManager) {
+	public GroupDaoTest(JdbcTemplate jdbcTemplate, GroupRowMapper groupRowMapper, GroupDao groupDao) {
 
+		this.jdbcTemplate = jdbcTemplate;
+		this.groupRowMapper = groupRowMapper;
 		this.groupDao = groupDao;
-		this.studentDao = studentDao;
-		this.entityManager = entityManager;
 
 	}
 
@@ -51,18 +57,18 @@ class JdbcGroupDaoTest {
 	@Transactional
 	void testGetAllForGroups_shouldCheckIfTableIsEmpty_whenMethodIsExecuted() {
 
-		assertThat(groupDao.getAll()).hasSize(0);
+		assertThat(groupDao.getAll()).isEmpty();
 
 	}
 
 	@Test
 	@Transactional
 	void testSaveForGroups_shouldCheckIfGroupHasBeenSaved_whenMethodIsExecuted() {
-		
+
 		Group group = new Group();
 		group.setGroupName("AA-01");
 		groupDao.save(group);
-		assertThat(groupDao.getAll()).hasSize(1);
+		assertThat(jdbcTemplate.query("select * from groups", groupRowMapper)).hasSize(1);
 
 	}
 
@@ -72,9 +78,9 @@ class JdbcGroupDaoTest {
 
 		Group group = new Group();
 		group.setGroupName("AA-02");
-		groupDao.save(group);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
 		groupDao.delete(1);
-		assertThat(groupDao.getAll()).hasSize(0);
+		assertThat(jdbcTemplate.query("select * from groups", groupRowMapper)).isEmpty();
 
 	}
 
@@ -84,7 +90,7 @@ class JdbcGroupDaoTest {
 
 		Group group = new Group();
 		group.setGroupName("AA-03");
-		groupDao.save(group);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
 		Optional<Group> result = groupDao.getById(1);
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getGroupId());
@@ -98,10 +104,10 @@ class JdbcGroupDaoTest {
 
 		Group group = new Group();
 		group.setGroupName("AA-04");
-		groupDao.save(group);
-		String[] params = { "UPDATED" };
-		groupDao.update(1, params);
-		Optional<Group> result = groupDao.getById(1);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
+		groupDao.update(1, "UPDATED");
+		Optional<Group> result = Optional
+				.ofNullable(jdbcTemplate.queryForObject("select * from groups where group_id = ?", groupRowMapper, 1));
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getGroupId());
 		assertEquals("UPDATED", result.get().getGroupName());
@@ -114,7 +120,7 @@ class JdbcGroupDaoTest {
 
 		Group group = new Group();
 		group.setGroupName("AA-05");
-		groupDao.save(group);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", group.getGroupName());
 		Optional<Group> result = groupDao.getByName("AA-05");
 		assertTrue(result.isPresent());
 		assertEquals(1, result.get().getGroupId());
@@ -130,8 +136,8 @@ class JdbcGroupDaoTest {
 		firstGroup.setGroupName("AA-06");
 		Group secondGroup = new Group();
 		secondGroup.setGroupName("AA-07");
-		groupDao.save(firstGroup);
-		groupDao.save(secondGroup);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", firstGroup.getGroupName());
+		jdbcTemplate.update("insert into groups (group_name) values (?)", secondGroup.getGroupName());
 		Student student1 = new Student();
 		student1.setGroupId(1);
 		student1.setFirstName("John");
@@ -144,9 +150,12 @@ class JdbcGroupDaoTest {
 		student3.setGroupId(2);
 		student3.setFirstName("Alex");
 		student3.setLastName("Miller");
-		studentDao.save(student1);
-		studentDao.save(student2);
-		studentDao.save(student3);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student1.getGroupId(), student1.getFirstName(), student1.getLastName());
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student2.getGroupId(), student2.getFirstName(), student2.getLastName());
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student3.getGroupId(), student3.getFirstName(), student3.getLastName());
 		Group result = groupDao.findGroupsByStudentNumber(1).get(0);
 		assertEquals(2, result.getGroupId());
 		assertEquals("AA-07", result.getGroupName());
@@ -161,8 +170,8 @@ class JdbcGroupDaoTest {
 		firstGroup.setGroupName("AA-08");
 		Group secondGroup = new Group();
 		secondGroup.setGroupName("AA-09");
-		groupDao.save(firstGroup);
-		groupDao.save(secondGroup);
+		jdbcTemplate.update("insert into groups (group_name) values (?)", firstGroup.getGroupName());
+		jdbcTemplate.update("insert into groups (group_name) values (?)", secondGroup.getGroupName());
 		Student student1 = new Student();
 		student1.setGroupId(1);
 		student1.setFirstName("John");
@@ -175,9 +184,12 @@ class JdbcGroupDaoTest {
 		student3.setGroupId(2);
 		student3.setFirstName("Alex");
 		student3.setLastName("Miller");
-		studentDao.save(student1);
-		studentDao.save(student2);
-		studentDao.save(student3);
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student1.getGroupId(), student1.getFirstName(), student1.getLastName());
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student2.getGroupId(), student2.getFirstName(), student2.getLastName());
+		jdbcTemplate.update("insert into students (group_id, first_name, last_name) values (?, ?, ?)",
+				student3.getGroupId(), student3.getFirstName(), student3.getLastName());
 		List<Group> results = groupDao.findGroupsByStudentNumber(4);
 		assertThat(results).hasSize(2);
 		Group firstResult = results.get(0);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,19 +28,20 @@ public class DbInit {
 	private static final int NUMBER_OF_GROUPS = 10;
 	private static final int MAX_NUMBER_OF_STUDENTS_IN_GROUP = 30;
 	private static final int MIN_NUMBER_OF_STUDENTS_IN_GROUP = 10;
-	private final EntityManager entityManager;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+	
 	private CourseService courseService;
 	private GroupService groupService;
 	private StudentService studentService;
 	Logger logger = LoggerFactory.getLogger(DbInit.class);
 
-	public DbInit(CourseService courseService, GroupService groupService,
-			StudentService studentService, EntityManager entityManager) {
+	public DbInit(CourseService courseService, GroupService groupService, StudentService studentService) {
 
 		this.courseService = courseService;
 		this.groupService = groupService;
 		this.studentService = studentService;
-		this.entityManager = entityManager;
 
 	}
 
@@ -54,6 +56,7 @@ public class DbInit {
 		for (int i = 0; i < courses.size(); i++) {
 
 			index++;
+			courses.get(i).setCourseId(index);
 			courseService.save(courses.get(i));
 
 			if (index < numberToGenerate && (i + 1) == courses.size()) {
@@ -83,7 +86,7 @@ public class DbInit {
 			String groupName = RandomStringUtils.randomAlphabetic(2).toUpperCase() + "-"
 					+ Generator.randomInRange(10, 99);
 
-			groupService.save(new Group(0, groupName));
+			groupService.save(new Group((i + 1), groupName));
 
 		}
 
@@ -101,7 +104,7 @@ public class DbInit {
 			String randomFirstName = Generator.getRandomNames(numberToGenerate).get(i);
 			String randomLastName = Generator.getRandomSurnames(numberToGenerate).get(i);
 
-			studentService.save(new Student(0, randomGroup, randomFirstName, randomLastName));
+			studentService.save(new Student((i + 1), randomGroup, randomFirstName, randomLastName));
 
 		}
 
