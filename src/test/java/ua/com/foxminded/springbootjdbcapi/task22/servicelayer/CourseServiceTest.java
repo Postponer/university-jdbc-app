@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.CourseDao;
 import ua.com.foxminded.springbootjdbcapi.task22.models.Course;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +24,7 @@ class CourseServiceTest {
 	private CourseService courseService;
 
 	@Mock
-	private JdbcCourseDao courseDao;
+	private CourseDao courseDao;
 
 	@Test
 	void testGetByName() {
@@ -33,7 +33,7 @@ class CourseServiceTest {
 		Optional<Course> optionalCourse = Optional.of(course);
 		Mockito.when(courseDao.getByName(Mockito.any(String.class))).thenReturn(optionalCourse);
 		Course result = courseService.getByName("Math");
-		Mockito.verify(courseDao).getByName(Mockito.any(String.class));
+		Mockito.verify(courseDao).getByName("Math");
 		assertEquals(1, result.getCourseId());
 		assertEquals("Math", result.getCourseName());
 		assertEquals("Math course", result.getCourseDescription());
@@ -48,7 +48,7 @@ class CourseServiceTest {
 		Optional<Course> optionalCourse = Optional.of(course);
 		Mockito.when(courseDao.getByDescription(Mockito.any(String.class))).thenReturn(optionalCourse);
 		Course result = courseService.getByDescription("Math course");
-		Mockito.verify(courseDao).getByDescription(Mockito.any(String.class));
+		Mockito.verify(courseDao).getByDescription("Math course");
 		assertEquals(1, result.getCourseId());
 		assertEquals("Math", result.getCourseName());
 		assertEquals("Math course", result.getCourseDescription());
@@ -61,9 +61,9 @@ class CourseServiceTest {
 
 		Course course = new Course(1, "Math", "Math course");
 		Optional<Course> optionalCourse = Optional.of(course);
-		Mockito.when(courseDao.getById(Mockito.any(Integer.class))).thenReturn(optionalCourse);
+		Mockito.when(courseDao.getById(Mockito.anyInt())).thenReturn(optionalCourse);
 		Course result = courseService.getById(1);
-		Mockito.verify(courseDao).getById(Mockito.any(Integer.class));
+		Mockito.verify(courseDao).getById(1);
 		assertEquals(1, result.getCourseId());
 		assertEquals("Math", result.getCourseName());
 		assertEquals("Math course", result.getCourseDescription());
@@ -93,9 +93,11 @@ class CourseServiceTest {
 	void testSave() {
 
 		Course course = new Course(1, "Math", "Math course");
-		Mockito.when(courseDao.save(Mockito.any(Course.class))).thenReturn(course);
+		Optional<Course> optionalCourse = Optional.of(course);
+		Mockito.when(courseDao.getById(Mockito.anyInt())).thenReturn(optionalCourse);
 		Course result = courseService.save(course);
-		Mockito.verify(courseDao).save(Mockito.any(Course.class));
+		Mockito.verify(courseDao).save(course.getCourseName(), course.getCourseDescription());
+		Mockito.verify(courseDao).getById(1);
 		assertEquals(1, result.getCourseId());
 		assertEquals("Math", result.getCourseName());
 		assertEquals("Math course", result.getCourseDescription());
@@ -106,12 +108,12 @@ class CourseServiceTest {
 	@Test
 	void testUpdate() {
 
-		String[] params = { "UPDATED", "UPDATED" };
 		Course updatedCourse = new Course(1, "UPDATED", "UPDATED");
-		Mockito.when(courseDao.update(Mockito.any(Integer.class), Mockito.any(String[].class)))
-				.thenReturn(updatedCourse);
-		assertThat(courseService.update(1, params)).isEqualTo(updatedCourse);
-		Mockito.verify(courseDao).update(Mockito.any(Integer.class), Mockito.any(String[].class));
+		Optional<Course> optionalCourse = Optional.of(updatedCourse);
+		Mockito.when(courseDao.getById(Mockito.anyInt())).thenReturn(optionalCourse);
+		assertThat(courseService.update(1, "UPDATED", "UPDATED")).isEqualTo(updatedCourse);
+		Mockito.verify(courseDao).update(1,"UPDATED", "UPDATED");
+		Mockito.verify(courseDao).getById(1);
 
 	}
 
@@ -119,7 +121,17 @@ class CourseServiceTest {
 	void testDelete() {
 
 		assertEquals(true, courseService.delete(1));
+		Mockito.verify(courseDao).delete(1);
 
+	}
+	
+	@Test
+	void testDeleteWhenExceptionIsThrown() {
+		
+		Mockito.doThrow(NullPointerException.class).when(courseDao).delete(Mockito.anyInt());
+		assertEquals(false, courseService.delete(1));
+		Mockito.verify(courseDao).delete(1);
+		
 	}
 
 }

@@ -12,22 +12,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import ua.com.foxminded.springbootjdbcapi.task22.Application;
 import ua.com.foxminded.springbootjdbcapi.task22.Config;
 import ua.com.foxminded.springbootjdbcapi.task22.consolemenu.ConsoleMenu;
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcCourseDao;
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcGroupDao;
-import ua.com.foxminded.springbootjdbcapi.task22.daolayer.JdbcStudentDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.CourseDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.GroupDao;
+import ua.com.foxminded.springbootjdbcapi.task22.daolayer.StudentDao;
 
 @SpringBootTest(classes = { Config.class, Application.class })
 class DbInitServiceTest {
 
-	private JdbcCourseDao courseDao;
-	private JdbcStudentDao studentDao;
-	private JdbcGroupDao groupDao;
+	private CourseDao courseDao;
+	private StudentDao studentDao;
+	private GroupDao groupDao;
 
 	@MockBean
 	private ConsoleMenu consoleMenu;
 
 	@Autowired
-	public DbInitServiceTest(JdbcCourseDao courseDao, JdbcStudentDao studentDao, JdbcGroupDao groupDao) {
+	public DbInitServiceTest(CourseDao courseDao, StudentDao studentDao, GroupDao groupDao) {
 
 		this.courseDao = courseDao;
 		this.studentDao = studentDao;
